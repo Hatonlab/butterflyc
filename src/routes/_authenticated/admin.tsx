@@ -355,7 +355,7 @@ function RoomEditor({
   const [name, setName] = useState(room.name);
   const [desc, setDesc] = useState(room.description);
   const fileRef = useRef<HTMLInputElement>(null);
-  const update = async (patch: Record<string, unknown>, ok = "تم الحفظ") => {
+  const update = async (patch: { name?: string; description?: string; image_url?: string; locked?: boolean }, ok = "تم الحفظ") => {
     const { error } = await supabase.from("rooms").update(patch).eq("id", room.id);
     if (error) toast.error("تعذر الحفظ");
     else toast.success(ok);
@@ -417,7 +417,7 @@ function RoomEditor({
 
 /* ---------------- Messages ---------------- */
 
-function MessagesTab({ me, people }: { me: Me; people?: Map<string, Person> }) {
+function MessagesTab({ me, people }: { me: Me; people?: Map<string, Person> | undefined }) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const { data } = useQuery({
@@ -453,7 +453,7 @@ function MessagesTab({ me, people }: { me: Me; people?: Map<string, Person> }) {
   );
 }
 
-function PrivateTab({ people }: { people?: Map<string, Person> }) {
+function PrivateTab({ people }: { people?: Map<string, Person> | undefined }) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const { data = [] } = useQuery({
@@ -489,7 +489,7 @@ function PrivateTab({ people }: { people?: Map<string, Person> }) {
 
 /* ---------------- UI bits ---------------- */
 
-function MsgRow({ who, meta, content, onDelete }: { who?: Person; meta: string; content: string; onDelete: () => void }) {
+function MsgRow({ who, meta, content, onDelete }: { who?: Person | undefined; meta: string; content: string; onDelete: () => void }) {
   return (
     <div className="glass flex items-start gap-3 rounded-2xl p-3">
       <UserAvatar src={who?.avatar_url} name={who?.username ?? "?"} className="h-9 w-9" />
