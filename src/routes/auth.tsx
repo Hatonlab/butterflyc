@@ -71,6 +71,7 @@ function AuthPage() {
     } finally {
       setBusy(false);
     }
+    return undefined;
   }
 
   return (

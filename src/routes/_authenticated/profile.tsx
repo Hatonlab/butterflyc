@@ -56,7 +56,7 @@ function ProfilePage() {
     if (error) return toast.error("تعذر تغيير كلمة السر، تأكد من كلمة السر الحالية");
     setPw("");
     setOldPw("");
-    toast.success("تم تغيير كلمة السر");
+    return toast.success("تم تغيير كلمة السر");
   }
 
   return (
