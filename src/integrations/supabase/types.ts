@@ -14,16 +14,259 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      private_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          read: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "private_messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "private_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          age: number
+          avatar_url: string | null
+          banned: boolean
+          created_at: string
+          gender: string
+          id: string
+          last_seen: string
+          status: string
+          username: string
+        }
+        Insert: {
+          age?: number
+          avatar_url?: string | null
+          banned?: boolean
+          created_at?: string
+          gender?: string
+          id: string
+          last_seen?: string
+          status?: string
+          username: string
+        }
+        Update: {
+          age?: number
+          avatar_url?: string | null
+          banned?: boolean
+          created_at?: string
+          gender?: string
+          id?: string
+          last_seen?: string
+          status?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      room_moderators: {
+        Row: {
+          id: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_moderators_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_moderators_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          locked: boolean
+          name: string
+          sort: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          locked?: boolean
+          name: string
+          sort?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          locked?: boolean
+          name?: string
+          sort?: number
+        }
+        Relationships: []
+      }
+      section_permissions: {
+        Row: {
+          id: string
+          section: Database["public"]["Enums"]["staff_section"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          section: Database["public"]["Enums"]["staff_section"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          section?: Database["public"]["Enums"]["staff_section"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "section_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_moderate_room: {
+        Args: { _room: string; _uid: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      has_section: {
+        Args: {
+          _section: Database["public"]["Enums"]["staff_section"]
+          _uid: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _uid: string }; Returns: boolean }
+      is_banned: { Args: { _uid: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner" | "admin" | "moderator"
+      staff_section: "members" | "rooms" | "messages" | "private"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +393,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["owner", "admin", "moderator"],
+      staff_section: ["members", "rooms", "messages", "private"],
+    },
   },
 } as const
