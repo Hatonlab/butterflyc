@@ -13,6 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedOnlineRouteImport } from './routes/_authenticated/online'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPrivateIndexRouteImport } from './routes/_authenticated/private.index'
+import { Route as AuthenticatedPrivateUserIdRouteImport } from './routes/_authenticated/private.$userId'
 import { Route as AuthenticatedRoomsRoomIdRouteImport } from './routes/_authenticated/rooms.$roomId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -34,6 +38,28 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOnlineRoute = AuthenticatedOnlineRouteImport.update({
+  id: '/online',
+  path: '/online',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPrivateIndexRoute =
+  AuthenticatedPrivateIndexRouteImport.update({
+    id: '/private/',
+    path: '/private/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPrivateUserIdRoute =
+  AuthenticatedPrivateUserIdRouteImport.update({
+    id: '/private/$userId',
+    path: '/private/$userId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRoomsRoomIdRoute =
   AuthenticatedRoomsRoomIdRouteImport.update({
     id: '/rooms/$roomId',
@@ -45,13 +71,21 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/online': typeof AuthenticatedOnlineRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/private/$userId': typeof AuthenticatedPrivateUserIdRoute
   '/rooms/$roomId': typeof AuthenticatedRoomsRoomIdRoute
+  '/private/': typeof AuthenticatedPrivateIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/online': typeof AuthenticatedOnlineRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/private/$userId': typeof AuthenticatedPrivateUserIdRoute
   '/rooms/$roomId': typeof AuthenticatedRoomsRoomIdRoute
+  '/private': typeof AuthenticatedPrivateIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,20 +93,44 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/online': typeof AuthenticatedOnlineRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/private/$userId': typeof AuthenticatedPrivateUserIdRoute
   '/_authenticated/rooms/$roomId': typeof AuthenticatedRoomsRoomIdRoute
+  '/_authenticated/private/': typeof AuthenticatedPrivateIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/home' | '/rooms/$roomId'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/home'
+    | '/online'
+    | '/profile'
+    | '/private/$userId'
+    | '/rooms/$roomId'
+    | '/private/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/home' | '/rooms/$roomId'
+  to:
+    | '/'
+    | '/auth'
+    | '/home'
+    | '/online'
+    | '/profile'
+    | '/private/$userId'
+    | '/rooms/$roomId'
+    | '/private'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/home'
+    | '/_authenticated/online'
+    | '/_authenticated/profile'
+    | '/_authenticated/private/$userId'
     | '/_authenticated/rooms/$roomId'
+    | '/_authenticated/private/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -111,6 +169,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/online': {
+      id: '/_authenticated/online'
+      path: '/online'
+      fullPath: '/online'
+      preLoaderRoute: typeof AuthenticatedOnlineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/private/': {
+      id: '/_authenticated/private/'
+      path: '/private'
+      fullPath: '/private/'
+      preLoaderRoute: typeof AuthenticatedPrivateIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/private/$userId': {
+      id: '/_authenticated/private/$userId'
+      path: '/private/$userId'
+      fullPath: '/private/$userId'
+      preLoaderRoute: typeof AuthenticatedPrivateUserIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rooms/$roomId': {
       id: '/_authenticated/rooms/$roomId'
       path: '/rooms/$roomId'
@@ -123,12 +209,20 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedOnlineRoute: typeof AuthenticatedOnlineRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedPrivateUserIdRoute: typeof AuthenticatedPrivateUserIdRoute
   AuthenticatedRoomsRoomIdRoute: typeof AuthenticatedRoomsRoomIdRoute
+  AuthenticatedPrivateIndexRoute: typeof AuthenticatedPrivateIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedOnlineRoute: AuthenticatedOnlineRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedPrivateUserIdRoute: AuthenticatedPrivateUserIdRoute,
   AuthenticatedRoomsRoomIdRoute: AuthenticatedRoomsRoomIdRoute,
+  AuthenticatedPrivateIndexRoute: AuthenticatedPrivateIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
