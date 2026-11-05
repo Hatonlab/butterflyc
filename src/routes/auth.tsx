@@ -38,7 +38,7 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent): Promise<unknown> {
     e.preventDefault();
     const name = normalizeUsername(username);
     if (Array.from(name).length < 2) return toast.error("الاسم قصير جداً");

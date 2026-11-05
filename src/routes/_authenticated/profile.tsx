@@ -39,18 +39,18 @@ function ProfilePage() {
 
   if (!me) return <AppShell>{null}</AppShell>;
 
-  async function save() {
+  async function save(): Promise<void> {
     const { error } = await supabase
       .from("profiles")
       .update({ status: status.trim(), gender, age: parseInt(age, 10) || 18, avatar_url: avatar })
       .eq("id", me!.profile.id);
-    if (error) return toast.error("تعذر الحفظ");
+    if (error) { toast.error("تعذر الحفظ"); return; }
     toast.success("تم حفظ الملف الشخصي");
     qc.invalidateQueries({ queryKey: meQueryKey });
     qc.invalidateQueries({ queryKey: ["people"] });
   }
 
-  async function changePw() {
+  async function changePw(): Promise<unknown> {
     if (pw.length < 6) return toast.error("كلمة السر 6 أحرف على الأقل");
     const { error } = await supabase.auth.updateUser({ password: pw, current_password: oldPw } as never);
     if (error) return toast.error("تعذر تغيير كلمة السر، تأكد من كلمة السر الحالية");

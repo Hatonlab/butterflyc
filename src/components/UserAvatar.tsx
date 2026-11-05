@@ -6,10 +6,10 @@ export function UserAvatar({
   online,
   className = "h-11 w-11",
 }: {
-  src?: string | null;
+  src?: string | null | undefined;
   name: string;
-  online?: boolean;
-  className?: string;
+  online?: boolean | undefined;
+  className?: string | undefined;
 }) {
   return (
     <div className={cn("relative shrink-0", className)}>
