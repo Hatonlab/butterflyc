@@ -53,8 +53,6 @@ function AuthPage() {
         const ageN = parseInt(age, 10);
         if (!avatar) throw new Error("اختر صورة المستخدم");
         if (!(ageN >= 10 && ageN <= 99)) throw new Error("العمر غير صالح");
-        const { data: taken } = await supabase.rpc as unknown as null;
-        void taken;
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
