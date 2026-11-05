@@ -1,23 +1,32 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { ButterflyMark } from "@/components/Logo";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "شات فراشات العرب - دردشة عربية عامة" },
+      { name: "description", content: "انضم إلى شات فراشات العرب: غرف دردشة عربية عامة، خاص، ومتصلين الآن." },
+      { property: "og:title", content: "شات فراشات العرب" },
+      { property: "og:description", content: "غرف دردشة عربية عامة للجميع" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      navigate({ to: data.session ? "/home" : "/auth", replace: true });
+    });
+  }, [navigate]);
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex min-h-dvh items-center justify-center">
+      <ButterflyMark className="h-20 w-20 animate-floaty" animated />
     </div>
   );
 }

@@ -1,0 +1,40 @@
+import { cn } from "@/lib/utils";
+
+export function UserAvatar({
+  src,
+  name,
+  online,
+  className = "h-11 w-11",
+}: {
+  src?: string | null;
+  name: string;
+  online?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={cn("relative shrink-0", className)}>
+      {src ? (
+        <img src={src} alt={name} className="h-full w-full rounded-full object-cover ring-2 ring-border" />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-primary font-bold text-primary-foreground">
+          {Array.from(name)[0] ?? "؟"}
+        </div>
+      )}
+      {online !== undefined && (
+        <span
+          className={cn(
+            "absolute bottom-0 left-0 h-3 w-3 rounded-full ring-2 ring-background",
+            online ? "bg-online" : "bg-muted-foreground",
+          )}
+        />
+      )}
+    </div>
+  );
+}
+
+export function RoleBadge({ label }: { label: string | null }) {
+  if (!label) return null;
+  return (
+    <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[10px] font-semibold text-gold">{label}</span>
+  );
+}
