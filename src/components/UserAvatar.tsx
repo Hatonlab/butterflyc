@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { levelFromXp } from "@/lib/gifts";
 
 export function UserAvatar({
   src,
@@ -29,6 +30,15 @@ export function UserAvatar({
         />
       )}
     </div>
+  );
+}
+
+export function LevelBadge({ xp }: { xp: number }) {
+  const { level } = levelFromXp(xp);
+  return (
+    <span className="rounded-full bg-gradient-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+      Lv.{level}
+    </span>
   );
 }
 
