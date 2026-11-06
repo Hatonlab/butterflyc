@@ -160,3 +160,40 @@
 @utility animate-floaty {
   animation: floaty 4s ease-in-out infinite;
 }
+
+/* ---------- motion ---------- */
+@keyframes msg-in { from { opacity: 0; transform: translateY(12px) scale(0.92); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes pop-in { 0% { opacity: 0; transform: scale(0.4); } 70% { transform: scale(1.12); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes slide-down { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: none; } }
+@keyframes eq { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+@keyframes gift-burst { 0% { transform: scale(0) rotate(-30deg); opacity: 0; } 40% { transform: scale(1.4) rotate(8deg); opacity: 1; } 70% { transform: scale(1) rotate(0); } 100% { transform: scale(1.8) translateY(-60px); opacity: 0; } }
+@keyframes spark { 0% { transform: rotate(var(--a)) translateY(0) scale(0.3); opacity: 1; } 100% { transform: rotate(var(--a)) translateY(-150px) scale(1.2); opacity: 0; } }
+@keyframes aurora { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(6%, -4%) scale(1.15); } 66% { transform: translate(-5%, 5%) scale(0.95); } }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+@utility animate-msg-in { animation: msg-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+@utility animate-pop-in { animation: pop-in 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.3) both; }
+@utility animate-page-in { animation: page-in 0.4s ease-out both; }
+@utility animate-slide-down { animation: slide-down 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+@utility animate-eq { height: 20%; animation: eq 0.8s ease-in-out infinite; }
+@utility animate-spin-slow { animation: spin-slow 4s linear infinite; }
+@utility animate-gift-burst { animation: gift-burst 1.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards; }
+@utility animate-spark { animation: spark 1.2s ease-out forwards; }
+@utility text-shimmer {
+  background: linear-gradient(90deg, var(--foreground) 0%, var(--primary-glow) 25%, var(--foreground) 50%) 0 0 / 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+body::before, body::after {
+  content: ""; position: fixed; z-index: -1; pointer-events: none; border-radius: 9999px; filter: blur(80px); opacity: 0.45;
+  animation: aurora 18s ease-in-out infinite;
+}
+body::before { width: 55vmax; height: 55vmax; top: -20vmax; right: -15vmax; background: color-mix(in oklab, var(--primary) 55%, transparent); }
+body::after { width: 45vmax; height: 45vmax; bottom: -18vmax; left: -12vmax; background: color-mix(in oklab, var(--online) 30%, var(--accent)); animation-delay: -9s; animation-duration: 22s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}

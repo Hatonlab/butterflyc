@@ -1,6 +1,8 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Home, Users, MessageCircle, UserRound, ShieldCheck, Ban } from "lucide-react";
+import { Home, Users, MessageCircle, UserRound, ShieldCheck, Ban, Coins } from "lucide-react";
+import { useActivityCoins } from "@/lib/coins";
+import { LevelBadge } from "./UserAvatar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/auth";
@@ -26,6 +28,7 @@ export function AppShell({
 }) {
   const { data: me } = useMe();
   useOnline(me?.profile.id);
+  useActivityCoins(me?.profile.id);
   const loc = useLocation();
   const { data: unread = 0 } = useQuery({
     queryKey: ["unread", me?.profile.id],
@@ -56,8 +59,16 @@ export function AppShell({
 
   return (
     <div className="mx-auto flex h-dvh max-w-2xl flex-col">
-      <header className="glass sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-3 border-x-0 border-t-0 px-4">
+      <header className="glass animate-slide-down sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-3 border-x-0 border-t-0 px-4">
         {header ?? <Logo />}
+        {!header && me && (
+          <div className="flex items-center gap-1.5">
+            <LevelBadge xp={me.profile.xp} />
+            <span key={me.profile.coins} className="animate-pop-in flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold text-gold">
+              <Coins className="h-3.5 w-3.5" /> {me.profile.coins}
+            </span>
+          </div>
+        )}
         {!header && me?.isStaff && (
           <Link
             to="/admin"
@@ -67,7 +78,7 @@ export function AppShell({
           </Link>
         )}
       </header>
-      <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
+      <main key={loc.pathname} className="animate-page-in min-h-0 flex-1 overflow-y-auto">{children}</main>
       {!hideNav && (
         <nav className="glass grid shrink-0 grid-cols-4 border-x-0 border-b-0 pb-[env(safe-area-inset-bottom)]">
           {tabs.map((t) => {
@@ -82,8 +93,8 @@ export function AppShell({
                   active ? "text-primary" : "text-muted-foreground",
                 )}
               >
-                {active && <span className="absolute top-0 h-0.5 w-10 rounded-full bg-gradient-primary" />}
-                <Icon className="h-5 w-5" />
+                {active && <span className="absolute top-0 h-0.5 w-10 rounded-full bg-gradient-primary shadow-glow" />}
+                <Icon className={cn("h-5 w-5 transition-transform duration-300", active && "-translate-y-0.5 scale-115 drop-shadow-[0_0_8px_var(--primary)]")} />
                 {t.label}
                 {t.to === "/private" && unread > 0 && (
                   <span className="absolute top-1.5 right-[calc(50%-18px)] min-w-4 rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
