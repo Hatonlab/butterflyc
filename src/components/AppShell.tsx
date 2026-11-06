@@ -94,7 +94,7 @@ export function AppShell({
                 )}
               >
                 {active && <span className="absolute top-0 h-0.5 w-10 rounded-full bg-gradient-primary shadow-glow" />}
-                <Icon className={cn("h-5 w-5 transition-transform duration-300", active && "-translate-y-0.5 scale-115 drop-shadow-[0_0_8px_var(--primary)]")} />
+                <Icon className={cn("h-5 w-5 transition-transform duration-300", active && "-translate-y-0.5 scale-110 drop-shadow-[0_0_8px_var(--primary)]")} />
                 {t.label}
                 {t.to === "/private" && unread > 0 && (
                   <span className="absolute top-1.5 right-[calc(50%-18px)] min-w-4 rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">

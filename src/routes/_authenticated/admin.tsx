@@ -475,7 +475,7 @@ function MessagesTab({ me, people }: { me: Me; people?: Map<string, Person> | un
           key={m.id}
           who={people?.get(m.user_id)}
           meta={`${data?.rooms.get(m.room_id) ?? ""} · ${timeAgo(m.created_at)}`}
-          content={m.content}
+          content={m.content || (m.media_type === "image" ? "📷 صورة" : m.media_type === "video" ? "🎬 فيديو" : "🎤 رسالة صوتية")}
           onDelete={async () => {
             await supabase.from("messages").delete().eq("id", m.id);
             qc.invalidateQueries({ queryKey: ["admin-msgs"] });
