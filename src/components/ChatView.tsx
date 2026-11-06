@@ -92,8 +92,8 @@ export function ChatView({
     e.target.value = "";
     if (!f) return;
     const type: MediaType | null = f.type.startsWith("image/") ? "image" : f.type.startsWith("video/") ? "video" : null;
-    if (!type) return toast.error("يمكن مشاركة الصور والفيديو فقط");
-    if (f.size > 50 * 1024 * 1024) return toast.error("الحد الأقصى 50 ميغابايت");
+    if (!type) { toast.error("يمكن مشاركة الصور والفيديو فقط"); return; }
+    if (f.size > 50 * 1024 * 1024) { toast.error("الحد الأقصى 50 ميغابايت"); return; }
     setSending(true);
     try {
       const ext = f.name.split(".").pop() || (type === "image" ? "jpg" : "mp4");

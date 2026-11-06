@@ -26,7 +26,10 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
     setBusy(true);
     const { error } = await supabase.rpc("send_gift", { _receiver: person.id, _gift: sel.key });
     setBusy(false);
-    if (error) return toast.error(error.message.includes("غير كاف") ? "رصيد الكونزات غير كافٍ" : "تعذر إرسال الهدية");
+    if (error) {
+      toast.error(error.message.includes("غير كاف") ? "رصيد الكونزات غير كافٍ" : "تعذر إرسال الهدية");
+      return;
+    }
     setBurst(sel);
     qc.invalidateQueries({ queryKey: meQueryKey });
     qc.invalidateQueries({ queryKey: ["people"] });

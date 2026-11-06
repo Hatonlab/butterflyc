@@ -8,7 +8,7 @@ const BUCKET = "chat-media";
 export async function uploadMedia(userId: string, file: Blob, type: MediaType, ext: string) {
   const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
-    contentType: file.type || undefined,
+    contentType: file.type || "application/octet-stream",
     upsert: false,
   });
   if (error) throw error;

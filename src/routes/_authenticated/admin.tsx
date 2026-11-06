@@ -323,9 +323,15 @@ function GrantCoins({ person }: { person: Person }) {
   const [amt, setAmt] = useState("100");
   async function grant(sign: 1 | -1) {
     const n = parseInt(amt, 10);
-    if (!n || n <= 0) return toast.error("أدخل عدداً صحيحاً");
+    if (!n || n <= 0) {
+      toast.error("أدخل عدداً صحيحاً");
+      return;
+    }
     const { data, error } = await supabase.rpc("admin_grant_coins", { _user: person.id, _amount: n * sign });
-    if (error) return toast.error("تعذر تنفيذ العملية");
+    if (error) {
+      toast.error("تعذر تنفيذ العملية");
+      return;
+    }
     toast.success(`الرصيد الجديد: ${data} كونز`);
     qc.invalidateQueries({ queryKey: ["people"] });
     qc.invalidateQueries({ queryKey: ["me"] });
