@@ -14,11 +14,55 @@ export type Database = {
   }
   public: {
     Tables: {
+      gifts: {
+        Row: {
+          cost: number
+          created_at: string
+          gift_key: string
+          id: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          cost: number
+          created_at?: string
+          gift_key: string
+          id?: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          cost?: number
+          created_at?: string
+          gift_key?: string
+          id?: string
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gifts_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gifts_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
           created_at: string
           id: string
+          media_type: string | null
+          media_url: string | null
           room_id: string
           user_id: string
         }
@@ -26,6 +70,8 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           room_id: string
           user_id: string
         }
@@ -33,6 +79,8 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           room_id?: string
           user_id?: string
         }
@@ -58,6 +106,8 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          media_type: string | null
+          media_url: string | null
           read: boolean
           receiver_id: string
           sender_id: string
@@ -66,6 +116,8 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           read?: boolean
           receiver_id: string
           sender_id: string
@@ -74,6 +126,8 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           read?: boolean
           receiver_id?: string
           sender_id?: string
@@ -100,34 +154,43 @@ export type Database = {
           age: number
           avatar_url: string | null
           banned: boolean
+          coins: number
           created_at: string
           gender: string
           id: string
+          last_coin_at: string
           last_seen: string
           status: string
           username: string
+          xp: number
         }
         Insert: {
           age?: number
           avatar_url?: string | null
           banned?: boolean
+          coins?: number
           created_at?: string
           gender?: string
           id: string
+          last_coin_at?: string
           last_seen?: string
           status?: string
           username: string
+          xp?: number
         }
         Update: {
           age?: number
           avatar_url?: string | null
           banned?: boolean
+          coins?: number
           created_at?: string
           gender?: string
           id?: string
+          last_coin_at?: string
           last_seen?: string
           status?: string
           username?: string
+          xp?: number
         }
         Relationships: []
       }
@@ -243,10 +306,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_grant_coins: {
+        Args: { _amount: number; _user: string }
+        Returns: number
+      }
       can_moderate_room: {
         Args: { _room: string; _uid: string }
         Returns: boolean
       }
+      claim_activity_coins: { Args: never; Returns: number }
+      gift_cost: { Args: { _key: string }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -263,6 +332,8 @@ export type Database = {
       }
       is_admin: { Args: { _uid: string }; Returns: boolean }
       is_banned: { Args: { _uid: string }; Returns: boolean }
+      send_gift: { Args: { _gift: string; _receiver: string }; Returns: number }
+      touch_coin_clock: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "owner" | "admin" | "moderator"

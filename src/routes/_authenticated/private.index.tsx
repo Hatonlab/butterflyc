@@ -69,7 +69,7 @@ function PrivateList() {
                   <span className="bidi-plain truncate font-semibold">{p?.username ?? "عضو"}</span>
                   <span className="text-[10px] text-muted-foreground">{timeAgo(c.last.created_at)}</span>
                 </div>
-                <p className="bidi-plain truncate text-sm text-muted-foreground">{c.last.content}</p>
+                <p className="bidi-plain truncate text-sm text-muted-foreground">{c.last.content || (c.last.media_type === "image" ? "📷 صورة" : c.last.media_type === "video" ? "🎬 فيديو" : "🎤 رسالة صوتية")}</p>
               </div>
               {c.unread > 0 && (
                 <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">{c.unread}</span>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { GiftDialog } from "@/components/GiftDialog";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +24,7 @@ function PrivateChat() {
   const online = useOnline(me?.profile.id);
   const { data: people } = usePeople();
   const other = people?.byId.get(userId);
+  const [gift, setGift] = useState(false);
   const myId = me?.profile.id;
   const key = ["pm", myId, userId];
 
@@ -76,7 +78,9 @@ function PrivateChat() {
           <Link to="/private" className="rounded-full p-1.5 hover:bg-secondary" aria-label="رجوع">
             <ArrowRight className="h-5 w-5" />
           </Link>
-          <UserAvatar src={other?.avatar_url} name={other?.username ?? "?"} online={online.has(userId)} className="h-10 w-10" />
+          <button onClick={() => setGift(true)} className="transition hover:scale-110" aria-label="الملف والهدايا">
+            <UserAvatar src={other?.avatar_url} name={other?.username ?? "?"} online={online.has(userId)} className="h-10 w-10" />
+          </button>
           <div className="min-w-0">
             <h1 className="bidi-plain truncate font-semibold">{other?.username}</h1>
             <p className="text-xs text-muted-foreground">{online.has(userId) ? "متصل الآن" : "غير متصل"}</p>
@@ -95,10 +99,10 @@ function PrivateChat() {
           await supabase.from("private_messages").delete().eq("id", m.id);
           qc.invalidateQueries({ queryKey: key });
         }}
-        onSend={async (content) => {
+        onSend={async (payload) => {
           const { error } = await supabase
             .from("private_messages")
-            .insert({ sender_id: me.profile.id, receiver_id: userId, content });
+            .insert({ sender_id: me.profile.id, receiver_id: userId, ...payload });
           if (error) {
             toast.error("تعذر الإرسال");
             throw error;
@@ -106,6 +110,7 @@ function PrivateChat() {
           qc.invalidateQueries({ queryKey: key });
         }}
       />
+      {gift && other && <GiftDialog person={other} onClose={() => setGift(false)} />}
     </AppShell>
   );
 }

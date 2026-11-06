@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { GiftDialog } from "@/components/GiftDialog";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,7 @@ function RoomPage() {
   const qc = useQueryClient();
   const { data: me } = useMe();
   const { data: people } = usePeople();
+  const [giftTo, setGiftTo] = useState<string | null>(null);
   const { data: room } = useQuery({
     queryKey: ["room", roomId],
     queryFn: async () => (await supabase.from("rooms").select("*").eq("id", roomId).single()).data,
@@ -60,7 +62,7 @@ function RoomPage() {
     const isRoomMod = false;
     return {
       ...m,
-      author: { username: p?.username ?? "عضو", avatar_url: p?.avatar_url ?? null, badge: p?.badge ?? (isRoomMod ? "مشرف" : null) },
+      author: { username: p?.username ?? "عضو", avatar_url: p?.avatar_url ?? null, badge: p?.badge ?? (isRoomMod ? "مشرف" : null), xp: p?.xp ?? 0 },
     };
   });
 
@@ -91,8 +93,9 @@ function RoomPage() {
           if (error) toast.error("تعذر الحذف");
           qc.invalidateQueries({ queryKey: key });
         }}
-        onSend={async (content) => {
-          const { error } = await supabase.from("messages").insert({ room_id: roomId, user_id: me.profile.id, content });
+        onAvatarClick={setGiftTo}
+        onSend={async (payload) => {
+          const { error } = await supabase.from("messages").insert({ room_id: roomId, user_id: me.profile.id, ...payload });
           if (error) {
             toast.error("تعذر إرسال الرسالة");
             throw error;
@@ -100,6 +103,7 @@ function RoomPage() {
           qc.invalidateQueries({ queryKey: key });
         }}
       />
+      {giftTo && people?.byId.get(giftTo) && <GiftDialog person={people.byId.get(giftTo)!} onClose={() => setGiftTo(null)} />}
     </AppShell>
   );
 }
