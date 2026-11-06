@@ -95,10 +95,10 @@ function PrivateChat() {
           await supabase.from("private_messages").delete().eq("id", m.id);
           qc.invalidateQueries({ queryKey: key });
         }}
-        onSend={async (content) => {
+        onSend={async (payload) => {
           const { error } = await supabase
             .from("private_messages")
-            .insert({ sender_id: me.profile.id, receiver_id: userId, content });
+            .insert({ sender_id: me.profile.id, receiver_id: userId, ...payload });
           if (error) {
             toast.error("تعذر الإرسال");
             throw error;
