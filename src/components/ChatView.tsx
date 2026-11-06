@@ -45,6 +45,7 @@ export function ChatView({
   disabled,
   disabledText,
   showAuthors = true,
+  readOnly,
 }: {
   messages: ChatMsg[];
   meId: string;
@@ -55,6 +56,7 @@ export function ChatView({
   disabled?: boolean;
   disabledText?: string;
   showAuthors?: boolean;
+  readOnly?: boolean;
 }) {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -208,6 +210,7 @@ export function ChatView({
         })}
         <div ref={endRef} />
       </div>
+      {!readOnly && (
       <form onSubmit={submit} className="glass relative flex shrink-0 items-center gap-2 border-x-0 border-b-0 p-3">
         <input ref={fileRef} type="file" accept="image/*,video/*" hidden onChange={onFile} />
         {recording ? (
@@ -271,6 +274,7 @@ export function ChatView({
           </span>
         </button>
       </form>
+      )}
     </div>
   );
 }

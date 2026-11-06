@@ -17,6 +17,8 @@ import { useOnline } from "@/lib/presence";
 import { fileToDataUrl, timeAgo } from "@/lib/image";
 import { adminDeleteUser, adminResetPassword } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
+import { ChatView } from "@/components/ChatView";
+import { Coins } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "لوحة التحكم - شات فراشات العرب" }] }),
@@ -202,6 +204,7 @@ function MemberDialog({ me, person, onClose }: { me: Me; person: Person; onClose
             <span className="bidi-plain">{person.username}</span>
           </DialogTitle>
         </DialogHeader>
+        {me.isAdmin && <GrantCoins person={person} />}
         {isOwnerTarget ? (
           <p className="text-sm text-muted-foreground">هذا حساب مالك التطبيق ولديه جميع الصلاحيات.</p>
         ) : (
@@ -312,6 +315,36 @@ function MemberDialog({ me, person, onClose }: { me: Me; person: Person; onClose
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function GrantCoins({ person }: { person: Person }) {
+  const qc = useQueryClient();
+  const [amt, setAmt] = useState("100");
+  async function grant(sign: 1 | -1) {
+    const n = parseInt(amt, 10);
+    if (!n || n <= 0) return toast.error("أدخل عدداً صحيحاً");
+    const { data, error } = await supabase.rpc("admin_grant_coins", { _user: person.id, _amount: n * sign });
+    if (error) return toast.error("تعذر تنفيذ العملية");
+    toast.success(`الرصيد الجديد: ${data} كونز`);
+    qc.invalidateQueries({ queryKey: ["people"] });
+    qc.invalidateQueries({ queryKey: ["me"] });
+  }
+  return (
+    <Group title={`الكونزات (الرصيد: ${person.coins ?? 0})`}>
+      <div className="flex w-full gap-2">
+        <input
+          value={amt}
+          onChange={(e) => setAmt(e.target.value.replace(/\D/g, ""))}
+          inputMode="numeric"
+          className="h-10 w-24 rounded-lg border border-input bg-secondary px-3 text-center outline-none"
+        />
+        <button onClick={() => grant(1)} className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-gold/15 font-semibold text-gold">
+          <Coins className="h-4 w-4" /> إضافة
+        </button>
+        <button onClick={() => grant(-1)} className="rounded-lg bg-secondary px-3 text-sm">خصم</button>
+      </div>
+    </Group>
   );
 }
 
@@ -454,36 +487,105 @@ function MessagesTab({ me, people }: { me: Me; people?: Map<string, Person> | un
 }
 
 function PrivateTab({ people }: { people?: Map<string, Person> | undefined }) {
-  const qc = useQueryClient();
   const [q, setQ] = useState("");
+  const [open, setOpen] = useState<[string, string] | null>(null);
   const { data = [] } = useQuery({
     queryKey: ["admin-pms"],
     queryFn: async () =>
-      (await supabase.from("private_messages").select("*").order("created_at", { ascending: false }).limit(300)).data ?? [],
+      (await supabase.from("private_messages").select("*").order("created_at", { ascending: false }).limit(2000)).data ?? [],
   });
-  const list = data.filter(
-    (m) =>
-      !q ||
-      m.content.includes(q) ||
-      people?.get(m.sender_id)?.username.includes(q) ||
-      people?.get(m.receiver_id)?.username.includes(q),
+  const convos = useMemo(() => {
+    const map = new Map<string, { a: string; b: string; last: (typeof data)[number]; count: number }>();
+    data.forEach((m) => {
+      const [a, b] = [m.sender_id, m.receiver_id].sort();
+      const k = `${a}|${b}`;
+      const c = map.get(k) ?? { a: a!, b: b!, last: m, count: 0 };
+      c.count++;
+      map.set(k, c);
+    });
+    return [...map.values()];
+  }, [data]);
+  const list = convos.filter(
+    (c) => !q || people?.get(c.a)?.username.includes(q) || people?.get(c.b)?.username.includes(q),
   );
   return (
     <div className="space-y-2">
       <SearchBox value={q} onChange={setQ} />
-      {list.map((m) => (
-        <MsgRow
-          key={m.id}
-          who={people?.get(m.sender_id)}
-          meta={`إلى ${people?.get(m.receiver_id)?.username ?? "؟"} · ${timeAgo(m.created_at)}`}
-          content={m.content}
-          onDelete={async () => {
-            await supabase.from("private_messages").delete().eq("id", m.id);
-            qc.invalidateQueries({ queryKey: ["admin-pms"] });
-          }}
-        />
-      ))}
+      {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">لا توجد محادثات</p>}
+      {list.map((c, i) => {
+        const A = people?.get(c.a);
+        const B = people?.get(c.b);
+        return (
+          <button
+            key={c.a + c.b}
+            onClick={() => setOpen([c.a, c.b])}
+            style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}
+            className="glass animate-msg-in flex w-full items-center gap-3 rounded-2xl p-3 text-right transition hover:border-primary/40"
+          >
+            <div className="flex -space-x-3 space-x-reverse">
+              <UserAvatar src={A?.avatar_url} name={A?.username ?? "?"} className="h-10 w-10" />
+              <UserAvatar src={B?.avatar_url} name={B?.username ?? "?"} className="h-10 w-10" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2 text-sm font-semibold">
+                <span className="bidi-plain truncate">{A?.username ?? "عضو"} ⟷ {B?.username ?? "عضو"}</span>
+                <span className="text-[10px] font-normal text-muted-foreground">{timeAgo(c.last.created_at)}</span>
+              </div>
+              <p className="bidi-plain truncate text-xs text-muted-foreground">{c.last.content || "📎 وسائط"}</p>
+            </div>
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px]">{c.count}</span>
+          </button>
+        );
+      })}
+      {open && <ConvoDialog pair={open} people={people} onClose={() => setOpen(null)} />}
     </div>
+  );
+}
+
+function ConvoDialog({ pair, people, onClose }: { pair: [string, string]; people?: Map<string, Person> | undefined; onClose: () => void }) {
+  const qc = useQueryClient();
+  const [a, b] = pair;
+  const key = ["admin-convo", a, b];
+  const { data: msgs = [] } = useQuery({
+    queryKey: key,
+    queryFn: async () =>
+      (
+        await supabase
+          .from("private_messages")
+          .select("*")
+          .or(`and(sender_id.eq.${a},receiver_id.eq.${b}),and(sender_id.eq.${b},receiver_id.eq.${a})`)
+          .order("created_at", { ascending: true })
+          .limit(1000)
+      ).data ?? [],
+  });
+  const A = people?.get(a);
+  const B = people?.get(b);
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent dir="rtl" className="flex h-[85dvh] flex-col gap-0 p-0 sm:max-w-lg">
+        <DialogHeader className="border-b border-border p-4">
+          <DialogTitle className="bidi-plain text-base">{A?.username} ⟷ {B?.username}</DialogTitle>
+        </DialogHeader>
+        <div className="min-h-0 flex-1">
+          <ChatView
+            showAuthors
+            readOnly
+            meId={a}
+            messages={msgs.map((m) => {
+              const p = people?.get(m.sender_id);
+              return { ...m, user_id: m.sender_id, author: { username: p?.username ?? "عضو", avatar_url: p?.avatar_url ?? null, badge: p?.badge ?? null } };
+            })}
+            canDelete={() => true}
+            onDelete={async (m) => {
+              await supabase.from("private_messages").delete().eq("id", m.id);
+              qc.invalidateQueries({ queryKey: key });
+              qc.invalidateQueries({ queryKey: ["admin-pms"] });
+            }}
+            onSend={async () => {}}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
