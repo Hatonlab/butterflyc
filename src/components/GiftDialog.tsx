@@ -39,7 +39,7 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent dir="rtl" className="glass overflow-hidden border-primary/20 sm:max-w-md">
+      <DialogContent dir="rtl" className="glass max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-x-hidden overflow-y-auto border-primary/20 p-4 sm:max-w-md sm:p-6">
         {burst && (
           <div className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center">
             <span className="animate-gift-burst text-8xl drop-shadow-2xl">{burst.emoji}</span>
@@ -62,11 +62,11 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
             <span className="absolute -inset-2 animate-spin-slow rounded-full bg-[conic-gradient(var(--primary),var(--gold),var(--primary-glow),var(--primary))] opacity-80 blur-[2px]" />
             <UserAvatar src={person.avatar_url} name={person.username} className="relative h-24 w-24" />
           </div>
-          <div className="flex items-center gap-2">
-            <h3 className="bidi-plain text-xl font-bold">{person.username}</h3>
+          <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-2">
+            <h3 className="bidi-plain min-w-0 break-all text-xl font-bold">{person.username}</h3>
             <RoleBadge label={person.badge} />
           </div>
-          {person.status && <p className="bidi-plain text-sm text-muted-foreground">{person.status}</p>}
+          {person.status && <p className="bidi-plain max-w-full break-words [overflow-wrap:anywhere] text-sm text-muted-foreground">{person.status}</p>}
           <div className="w-full max-w-60">
             <div className="mb-1 flex justify-between text-xs">
               <LevelBadge xp={person.xp ?? 0} />
