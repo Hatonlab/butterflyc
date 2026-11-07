@@ -27,9 +27,9 @@ export function ButterflyMark({ className = "h-10 w-10", animated = false }: { c
 
 export function Logo() {
   return (
-    <div className="flex items-center gap-2">
-      <ButterflyMark className="h-9 w-9" />
-      <span className="font-display text-xl text-gradient">شات فراشات العرب</span>
+    <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+      <ButterflyMark className="h-8 w-8 shrink-0 sm:h-9 sm:w-9" />
+      <span className="min-w-0 font-display text-base text-gradient sm:text-xl">شات فراشات العرب</span>
     </div>
   );
 }

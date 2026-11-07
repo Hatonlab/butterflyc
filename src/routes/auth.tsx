@@ -7,6 +7,7 @@ import { normalizeUsername, usernameToEmail } from "@/lib/auth";
 import { fileToDataUrl } from "@/lib/image";
 import { ButterflyMark } from "@/components/Logo";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -75,18 +76,18 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="flex min-h-dvh min-w-0 items-start justify-center overflow-x-hidden px-4 py-6 sm:items-center">
+      <div className="my-auto w-full min-w-0 max-w-md">
         <div className="mb-6 flex flex-col items-center text-center">
-          <ButterflyMark className="h-24 w-24 animate-floaty" animated />
-          <h1 className="mt-3 font-display text-4xl text-gradient">شات فراشات العرب</h1>
+          <ButterflyMark className="h-20 w-20 animate-floaty sm:h-24 sm:w-24" animated />
+          <h1 className="mt-3 break-words font-display text-3xl text-gradient sm:text-4xl">شات فراشات العرب</h1>
           <p className="mt-2 text-sm text-muted-foreground">دردشة عربية راقية تجمع الفراشات من كل مكان</p>
         </div>
 
-        <div className="glass rounded-3xl p-5 shadow-glow">
+        <div className="glass rounded-2xl p-4 shadow-glow sm:p-5">
           <div className="mb-5 grid grid-cols-2 rounded-xl bg-secondary p-1">
             {(["login", "signup"] as const).map((m) => (
-              <button
+              <Button variant="ghost"
                 key={m}
                 type="button"
                 onClick={() => setMode(m)}
@@ -96,14 +97,14 @@ function AuthPage() {
                 )}
               >
                 {m === "login" ? "دخول" : "تسجيل جديد"}
-              </button>
+              </Button>
             ))}
           </div>
 
           <form onSubmit={submit} className="space-y-3">
             {mode === "signup" && (
               <div className="flex justify-center pb-1">
-                <button
+                <Button variant="ghost"
                   type="button"
                   onClick={() => fileRef.current?.click()}
                   className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-dashed border-primary/60 bg-secondary"
@@ -116,7 +117,7 @@ function AuthPage() {
                       صورتك
                     </span>
                   )}
-                </button>
+                </Button>
                 <input
                   ref={fileRef}
                   type="file"
@@ -139,20 +140,21 @@ function AuthPage() {
             />
             <div className="relative">
               <input
-                className={field}
+                className={cn(field, "pl-12")}
                 type={show ? "text" : "password"}
                 placeholder="كلمة السر"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={mode === "login" ? "current-password" : "new-password"}
               />
-              <button
+              <Button variant="ghost" size="icon"
                 type="button"
                 onClick={() => setShow(!show)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                aria-label={show ? "إخفاء كلمة السر" : "إظهار كلمة السر"}
+                className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
               >
                 {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
+              </Button>
             </div>
             {mode === "signup" && (
               <>
@@ -166,7 +168,7 @@ function AuthPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="grid grid-cols-2 rounded-xl bg-secondary p-1">
                     {["ذكر", "أنثى"].map((g) => (
-                      <button
+                      <Button variant="ghost"
                         key={g}
                         type="button"
                         onClick={() => setGender(g)}
@@ -176,7 +178,7 @@ function AuthPage() {
                         )}
                       >
                         {g}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                   <input
@@ -191,12 +193,12 @@ function AuthPage() {
                 </div>
               </>
             )}
-            <button
+            <Button type="submit"
               disabled={busy}
               className="flex h-12 w-full items-center justify-center rounded-xl bg-gradient-primary font-semibold text-primary-foreground shadow-glow transition active:scale-[.98] disabled:opacity-60"
             >
               {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : mode === "login" ? "دخول" : "إنشاء الحساب"}
-            </button>
+            </Button>
           </form>
         </div>
         <p className="mt-4 text-center text-xs text-muted-foreground">لا نطلب بريداً إلكترونياً أو رقم هاتف أبداً 🦋</p>

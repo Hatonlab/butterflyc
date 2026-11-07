@@ -11,7 +11,7 @@ import { fileToDataUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "ملفي الشخصي - شات فراشات العرب" }] }),
+  head: () => ({ meta: [{ title: "ملفي الشخصي - شات فراشات العرب" }, { name: "description", content: "صورتك وحالتك وإعدادات حسابك في شات فراشات العرب." }, { property: "og:title", content: "ملفي الشخصي - شات فراشات العرب" }, { property: "og:description", content: "الملف الشخصي وإعدادات حسابك." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ProfilePage,
 });
 
