@@ -19,9 +19,12 @@ export function useMediaUrl(path: string | null | undefined) {
   return useQuery({
     queryKey: ["media-url", path],
     enabled: !!path,
-    staleTime: 1000 * 60 * 60 * 20,
+    staleTime: 1000 * 60 * 50,
+    retry: 2,
     queryFn: async () => {
-      const { data } = await supabase.storage.from(BUCKET).createSignedUrl(path!, 60 * 60 * 24);
+      if (!path) return null;
+      const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60);
+      if (error) throw error;
       return data?.signedUrl ?? null;
     },
   });

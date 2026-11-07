@@ -1,0 +1,4 @@
+ALTER TABLE public.messages DROP CONSTRAINT messages_content_check;
+ALTER TABLE public.messages ADD CONSTRAINT messages_content_check CHECK (char_length(content) <= 2000 AND (char_length(btrim(content)) > 0 OR (NULLIF(btrim(media_url), '') IS NOT NULL AND media_type IN ('image', 'video', 'audio'))));
+ALTER TABLE public.private_messages DROP CONSTRAINT private_messages_content_check;
+ALTER TABLE public.private_messages ADD CONSTRAINT private_messages_content_check CHECK (char_length(content) <= 2000 AND (char_length(btrim(content)) > 0 OR (NULLIF(btrim(media_url), '') IS NOT NULL AND media_type IN ('image', 'video', 'audio'))));
