@@ -9,6 +9,7 @@ import { useMe } from "@/lib/auth";
 import { useOnline } from "@/lib/presence";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const tabs = [
   { to: "/home", label: "الرئيسية", icon: Home },
@@ -35,10 +36,11 @@ export function AppShell({
     enabled: !!me,
     refetchInterval: 15000,
     queryFn: async () => {
+      if (!me) return 0;
       const { count } = await supabase
         .from("private_messages")
         .select("id", { count: "exact", head: true })
-        .eq("receiver_id", me!.profile.id)
+        .eq("receiver_id", me.profile.id)
         .eq("read", false);
       return count ?? 0;
     },
@@ -50,21 +52,21 @@ export function AppShell({
         <Ban className="h-16 w-16 text-destructive" />
         <h1 className="font-display text-2xl">تم حظر حسابك</h1>
         <p className="text-muted-foreground">تواصل مع إدارة التطبيق لمزيد من المعلومات.</p>
-        <button className="text-primary underline" onClick={() => supabase.auth.signOut()}>
+        <Button variant="link" onClick={() => supabase.auth.signOut()}>
           تسجيل الخروج
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto flex h-dvh max-w-2xl flex-col">
-      <header className="glass animate-slide-down sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-3 border-x-0 border-t-0 px-4">
-        {header ?? <Logo />}
+    <div className="mx-auto flex h-dvh w-full min-w-0 max-w-2xl flex-col overflow-hidden">
+      <header className="glass sticky top-0 z-20 grid min-h-16 shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-x-0 border-t-0 px-3 py-2 sm:flex sm:justify-between sm:px-4">
+        <div className="min-w-0">{header ?? <Logo />}</div>
         {!header && me && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex shrink-0 items-center gap-1.5">
             <LevelBadge xp={me.profile.xp} />
-            <span key={me.profile.coins} className="animate-pop-in flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold text-gold">
+            <span className="flex items-center gap-1 rounded-full bg-gold/15 px-2 py-1 text-xs font-bold text-gold">
               <Coins className="h-3.5 w-3.5" /> {me.profile.coins}
             </span>
           </div>
@@ -72,13 +74,13 @@ export function AppShell({
         {!header && me?.isStaff && (
           <Link
             to="/admin"
-            className="flex items-center gap-1 rounded-full bg-gold/15 px-3 py-1.5 text-xs font-semibold text-gold"
+            className="col-span-2 flex w-fit shrink-0 items-center gap-1 justify-self-end rounded-full bg-gold/15 px-2.5 py-1 text-xs font-semibold text-gold sm:py-1.5"
           >
             <ShieldCheck className="h-4 w-4" /> لوحة التحكم
           </Link>
         )}
       </header>
-      <main key={loc.pathname} className="animate-page-in min-h-0 flex-1 overflow-y-auto">{children}</main>
+      <main key={loc.pathname} className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto">{children}</main>
       {!hideNav && (
         <nav className="glass grid shrink-0 grid-cols-4 border-x-0 border-b-0 pb-[env(safe-area-inset-bottom)]">
           {tabs.map((t) => {
@@ -89,7 +91,7 @@ export function AppShell({
                 key={t.to}
                 to={t.to}
                 className={cn(
-                  "relative flex flex-col items-center gap-1 py-2.5 text-[11px] transition-colors",
+                  "relative flex min-w-0 flex-col items-center gap-1 py-2.5 text-[11px] transition-colors",
                   active ? "text-primary" : "text-muted-foreground",
                 )}
               >
