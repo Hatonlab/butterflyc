@@ -13,7 +13,7 @@ import { usePeople } from "@/lib/people";
 import { useOnline } from "@/lib/presence";
 
 export const Route = createFileRoute("/_authenticated/private/$userId")({
-  head: () => ({ meta: [{ title: "محادثة خاصة - شات فراشات العرب" }] }),
+  head: () => ({ meta: [{ title: "محادثة خاصة - شات فراشات العرب" }, { name: "description", content: "رسائلك الخاصة ومرفقاتك في شات فراشات العرب." }, { property: "og:title", content: "محادثة خاصة - شات فراشات العرب" }, { property: "og:description", content: "رسائلك الخاصة ومرفقاتك في مكان واحد." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: PrivateChat,
 });
 
@@ -75,10 +75,10 @@ function PrivateChat() {
       hideNav
       header={
         <div className="flex min-w-0 items-center gap-3">
-          <Link to="/private" className="rounded-full p-1.5 hover:bg-secondary" aria-label="رجوع">
+          <Link to="/private" className="shrink-0 rounded-full p-1.5 hover:bg-secondary" aria-label="رجوع">
             <ArrowRight className="h-5 w-5" />
           </Link>
-          <button onClick={() => setGift(true)} className="transition hover:scale-110" aria-label="الملف والهدايا">
+          <button onClick={() => setGift(true)} className="shrink-0" aria-label="الملف والهدايا">
             <UserAvatar src={other?.avatar_url} name={other?.username ?? "?"} online={online.has(userId)} className="h-10 w-10" />
           </button>
           <div className="min-w-0">

@@ -10,7 +10,7 @@ import { useOnline } from "@/lib/presence";
 import { timeAgo } from "@/lib/image";
 
 export const Route = createFileRoute("/_authenticated/private/")({
-  head: () => ({ meta: [{ title: "الخاص - شات فراشات العرب" }] }),
+  head: () => ({ meta: [{ title: "الخاص - شات فراشات العرب" }, { name: "description", content: "كل محادثاتك الخاصة في شات فراشات العرب." }, { property: "og:title", content: "الخاص - شات فراشات العرب" }, { property: "og:description", content: "المحادثات الخاصة والرسائل غير المقروءة." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: PrivateList,
 });
 
@@ -67,7 +67,7 @@ function PrivateList() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <span className="bidi-plain truncate font-semibold">{p?.username ?? "عضو"}</span>
-                  <span className="text-[10px] text-muted-foreground">{timeAgo(c.last.created_at)}</span>
+                  <span className="shrink-0 text-[10px] text-muted-foreground">{timeAgo(c.last.created_at)}</span>
                 </div>
                 <p className="bidi-plain truncate text-sm text-muted-foreground">{c.last.content || (c.last.media_type === "image" ? "📷 صورة" : c.last.media_type === "video" ? "🎬 فيديو" : "🎤 رسالة صوتية")}</p>
               </div>

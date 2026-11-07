@@ -9,7 +9,7 @@ import { usePeople } from "@/lib/people";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/online")({
-  head: () => ({ meta: [{ title: "المتصلين - شات فراشات العرب" }] }),
+  head: () => ({ meta: [{ title: "المتصلين - شات فراشات العرب" }, { name: "description", content: "قائمة الأعضاء والمتصلين الآن في شات فراشات العرب." }, { property: "og:title", content: "المتصلين - شات فراشات العرب" }, { property: "og:description", content: "ابحث عن الأعضاء والمتصلين الآن." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: OnlinePage,
 });
 
@@ -71,7 +71,7 @@ function OnlinePage() {
                 <Link
                   to="/private/$userId"
                   params={{ userId: p.id }}
-                  className="rounded-full bg-primary/15 p-2.5 text-primary"
+                  className="shrink-0 rounded-full bg-primary/15 p-2.5 text-primary"
                   aria-label="مراسلة"
                 >
                   <MessageCircle className="h-5 w-5" />

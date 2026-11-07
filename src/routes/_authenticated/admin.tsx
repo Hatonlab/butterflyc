@@ -21,7 +21,7 @@ import { ChatView } from "@/components/ChatView";
 import { Coins } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({ meta: [{ title: "لوحة التحكم - شات فراشات العرب" }] }),
+  head: () => ({ meta: [{ title: "لوحة التحكم - شات فراشات العرب" }, { name: "description", content: "إدارة أعضاء وغرف ورسائل شات فراشات العرب." }, { property: "og:title", content: "لوحة التحكم - شات فراشات العرب" }, { property: "og:description", content: "لوحة إدارة شات فراشات العرب." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AdminPage,
 });
 

@@ -7,7 +7,7 @@ import { useMe } from "@/lib/auth";
 import { useOnline } from "@/lib/presence";
 
 export const Route = createFileRoute("/_authenticated/home")({
-  head: () => ({ meta: [{ title: "الغرف - شات فراشات العرب" }] }),
+  head: () => ({ meta: [{ title: "الغرف - شات فراشات العرب" }, { name: "description", content: "غرف شات فراشات العرب وأعضاؤها المتصلون." }, { property: "og:title", content: "الغرف - شات فراشات العرب" }, { property: "og:description", content: "اختر غرفة الدردشة العربية المفضلة لديك." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Home,
 });
 
@@ -35,7 +35,7 @@ function Home() {
             <path d="M100 60C80 10 20 0 10 30s20 50 90 30Zm0 0c20-50 80-60 90-30s-20 50-90 30Z" fill="currentColor" />
           </svg>
           <p className="text-sm opacity-80">أهلاً بك</p>
-          <h2 className="bidi-plain mt-1 font-display text-2xl">{me?.profile.username}</h2>
+          <h2 className="bidi-plain mt-1 break-words [overflow-wrap:anywhere] font-display text-2xl">{me?.profile.username}</h2>
           <p className="mt-2 text-sm opacity-90">
             <span className="font-bold">{online.size}</span> متصل الآن · اختر غرفتك وابدأ الدردشة
           </p>
@@ -55,7 +55,7 @@ function Home() {
               <img
                 src={r.image_url || "/rooms/general.svg"}
                 alt={r.name}
-                className="h-16 w-16 rounded-2xl object-cover shadow-glow"
+                className="h-14 w-14 shrink-0 rounded-xl object-cover sm:h-16 sm:w-16"
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -64,7 +64,7 @@ function Home() {
                 </div>
                 <p className="bidi-plain mt-1 line-clamp-2 text-sm text-muted-foreground">{r.description}</p>
               </div>
-              <ChevronLeft className="h-5 w-5 text-muted-foreground transition group-hover:-translate-x-1 group-hover:text-primary" />
+              <ChevronLeft className="h-5 w-5 shrink-0 text-muted-foreground transition group-hover:-translate-x-1 group-hover:text-primary" />
             </Link>
           ))}
         </div>

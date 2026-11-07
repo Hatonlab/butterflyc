@@ -11,7 +11,7 @@ import { useMe } from "@/lib/auth";
 import { usePeople } from "@/lib/people";
 
 export const Route = createFileRoute("/_authenticated/rooms/$roomId")({
-  head: () => ({ meta: [{ title: "غرفة دردشة - شات فراشات العرب" }] }),
+  head: () => ({ meta: [{ title: "غرفة دردشة - شات فراشات العرب" }, { name: "description", content: "محادثات الغرفة والصور والفيديو والصوت في شات فراشات العرب." }, { property: "og:title", content: "غرفة دردشة - شات فراشات العرب" }, { property: "og:description", content: "محادثات الغرفة والصور والفيديو والصوت." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: RoomPage,
 });
 
@@ -71,10 +71,10 @@ function RoomPage() {
       hideNav
       header={
         <div className="flex min-w-0 items-center gap-3">
-          <Link to="/home" className="rounded-full p-1.5 hover:bg-secondary" aria-label="رجوع">
+          <Link to="/home" className="shrink-0 rounded-full p-1.5 hover:bg-secondary" aria-label="رجوع">
             <ArrowRight className="h-5 w-5" />
           </Link>
-          {room && <img src={room.image_url || "/rooms/general.svg"} alt="" className="h-10 w-10 rounded-xl" />}
+          {room && <img src={room.image_url || "/rooms/general.svg"} alt="" className="h-10 w-10 shrink-0 rounded-xl" />}
           <div className="min-w-0">
             <h1 className="bidi-plain truncate font-semibold">{room?.name}</h1>
             <p className="bidi-plain truncate text-xs text-muted-foreground">{room?.description}</p>
