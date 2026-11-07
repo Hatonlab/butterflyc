@@ -10,7 +10,7 @@ vi.mock("@/components/AudioPlayer", () => ({ AudioPlayer: () => null }));
 describe("Chat media sending", () => {
   beforeEach(() => upload.mockReset());
   afterEach(cleanup);
-  for (const [type, name] of [["image", "photo.png"], ["video", "clip.mp4"]]) {
+  for (const [type, name] of [["image", "photo.png"], ["video", "clip.mp4"]] as const) {
     it(`sends a ${type} without requiring text`, async () => {
       const onSend = vi.fn().mockResolvedValue(undefined);
       upload.mockResolvedValue({ media_url: `member/${name}`, media_type: type });
