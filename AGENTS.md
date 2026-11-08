@@ -11,3 +11,6 @@
 
 - Media-only chat messages use an empty content string and a valid media path/type; both message tables enforce this invariant so uploads do not require captions.
 - Keep the shared chat composer and audio controls dimensionally stable, and constrain scrolling to the message list to prevent phone viewport shifts.
+- Store cosmetic rank definitions and member assignments separately from authority roles; RLS protects owner assignments so visual promotion never removes owner authority.
+- Drive shared gift celebrations from committed gift INSERT events, never client-sent announcements, so only paid successful gifts appear to members.
+- Admin room-message grouping loads paginated history without a fixed row cap, then groups by member and room so moderation includes the full visible history.
