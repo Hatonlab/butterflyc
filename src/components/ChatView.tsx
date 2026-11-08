@@ -198,7 +198,7 @@ export function ChatView({
                 )}
                 <div
                   className={cn(
-                    "bidi-plain min-w-0 space-y-1.5 whitespace-pre-wrap break-words [overflow-wrap:anywhere] rounded-2xl text-[15px] leading-relaxed",
+                    "bidi-plain min-w-0 space-y-1.5 whitespace-pre-wrap break-words [overflow-wrap:anywhere] rounded-2xl text-base leading-relaxed",
                     onlyMedia && m.media_type !== "audio" ? "p-1" : "px-3.5 py-2",
                     mine
                       ? "rounded-bl-md bg-gradient-primary text-primary-foreground shadow-glow"
@@ -230,7 +230,7 @@ export function ChatView({
       <form onSubmit={submit} className="glass relative grid min-w-0 shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-x-0 border-b-0 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <input ref={fileRef} type="file" accept="image/*,video/*" hidden onChange={onFile} />
         {recording ? (
-          <div className="flex h-11 min-w-0 items-center gap-2 rounded-full border border-destructive/40 bg-destructive/10 px-3">
+          <div className="flex h-12 min-w-0 items-center gap-2 rounded-full border border-destructive/40 bg-destructive/10 px-3">
             <span className="relative flex h-3 w-3">
               <span className="relative h-3 w-3 rounded-full bg-destructive" />
             </span>
@@ -252,7 +252,7 @@ export function ChatView({
               type="button"
               disabled={disabled || sending}
               onClick={() => fileRef.current?.click()}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-secondary text-muted-foreground transition hover:text-primary active:scale-90 disabled:opacity-40"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-muted-foreground transition hover:text-primary active:scale-90 disabled:opacity-40"
               aria-label="إرفاق صورة أو فيديو"
             >
               <Paperclip className="h-5 w-5" />
@@ -263,7 +263,7 @@ export function ChatView({
                disabled={disabled || sending}
               maxLength={2000}
               placeholder={disabled ? disabledText : "اكتب رسالتك... تدعم الزخرفة 🦋"}
-              className="h-11 min-w-0 flex-1 rounded-full border border-input bg-secondary px-4 text-[15px] outline-none transition focus:ring-2 focus:ring-ring"
+              className="h-12 min-w-0 flex-1 rounded-full border border-input bg-secondary px-4 text-base outline-none transition focus:ring-2 focus:ring-ring"
             />
           </div>
         )}
@@ -272,7 +272,7 @@ export function ChatView({
           disabled={disabled || sending}
           onClick={recording ? () => stopRec(false) : hasText ? undefined : () => void startRec()}
           className={cn(
-            "relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-primary text-primary-foreground shadow-glow disabled:opacity-40",
+            "relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-primary text-primary-foreground shadow-glow disabled:opacity-40",
           )}
           aria-label={hasText || recording ? "إرسال" : "تسجيل صوت"}
         >

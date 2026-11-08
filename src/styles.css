@@ -196,3 +196,16 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
+
+.app-frame { background: var(--background); }
+.gift-celebration { animation: gift-arrival 3.5s ease both; }
+.gift-center { animation: gift-rise 1.2s ease both; }
+@keyframes gift-arrival {
+  0% { opacity: 0; transform: translateY(30px) scale(.9); }
+  12%, 85% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-24px); }
+}
+@keyframes gift-rise {
+  from { transform: scale(.3) rotate(-18deg); }
+  to { transform: scale(1) rotate(0); }
+}

@@ -1,0 +1,13 @@
+CREATE TABLE public.chat_ranks (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), name text NOT NULL CHECK (char_length(name) BETWEEN 1 AND 40), badge text NOT NULL DEFAULT '⭐' CHECK (char_length(badge) BETWEEN 1 AND 16), position integer NOT NULL DEFAULT 1 CHECK(position >= 1));
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.chat_ranks TO authenticated;
+GRANT ALL ON public.chat_ranks TO service_role;
+ALTER TABLE public.chat_ranks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "members read ranks" ON public.chat_ranks FOR SELECT TO authenticated USING (NOT public.is_banned(auth.uid()));
+CREATE POLICY "admins manage ranks" ON public.chat_ranks FOR ALL TO authenticated USING (public.is_admin(auth.uid()) AND NOT public.is_banned(auth.uid())) WITH CHECK (public.is_admin(auth.uid()) AND NOT public.is_banned(auth.uid()));
+CREATE TABLE public.member_ranks (user_id uuid PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE, rank_id uuid NOT NULL REFERENCES public.chat_ranks(id) ON DELETE CASCADE);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.member_ranks TO authenticated;
+GRANT ALL ON public.member_ranks TO service_role;
+ALTER TABLE public.member_ranks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "members read assignments" ON public.member_ranks FOR SELECT TO authenticated USING (NOT public.is_banned(auth.uid()));
+CREATE POLICY "admins assign ranks" ON public.member_ranks FOR ALL TO authenticated USING (public.is_admin(auth.uid()) AND NOT public.is_banned(auth.uid()) AND (NOT public.has_role(user_id, 'owner') OR public.has_role(auth.uid(), 'owner'))) WITH CHECK (public.is_admin(auth.uid()) AND NOT public.is_banned(auth.uid()) AND (NOT public.has_role(user_id, 'owner') OR public.has_role(auth.uid(), 'owner')));
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND schemaname='public' AND tablename='gifts') THEN ALTER PUBLICATION supabase_realtime ADD TABLE public.gifts; END IF; END $$;

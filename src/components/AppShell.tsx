@@ -10,6 +10,8 @@ import { useOnline } from "@/lib/presence";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { GiftEffects } from "./GiftEffects";
+import { compactCoins } from "@/lib/chat-presentation";
 
 const tabs = [
   { to: "/home", label: "الرئيسية", icon: Home },
@@ -60,14 +62,15 @@ export function AppShell({
   }
 
   return (
-    <div className="mx-auto flex h-dvh w-full min-w-0 max-w-2xl flex-col overflow-hidden">
+    <div className="app-frame mx-auto flex h-dvh w-full min-w-0 max-w-3xl flex-col overflow-hidden">
+      <GiftEffects userId={me?.profile.id} />
       <header className="glass sticky top-0 z-20 grid min-h-16 shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-x-0 border-t-0 px-3 py-2 sm:flex sm:justify-between sm:px-4">
         <div className="min-w-0">{header ?? <Logo />}</div>
-        {!header && me && (
+        {me && (
           <div className="flex shrink-0 items-center gap-1.5">
             <LevelBadge xp={me.profile.xp} />
-            <span className="flex items-center gap-1 rounded-full bg-gold/15 px-2 py-1 text-xs font-bold text-gold">
-              <Coins className="h-3.5 w-3.5" /> {me.profile.coins}
+            <span title={`${me.profile.coins} كونز`} aria-label={`${me.profile.coins} كونز`} className="flex items-center gap-1 rounded-full border border-gold/20 bg-gold/10 px-2.5 py-1.5 text-sm font-bold text-gold">
+              <Coins className="h-4 w-4" /> <bdi dir="ltr">{compactCoins(me.profile.coins)}</bdi>
             </span>
           </div>
         )}
@@ -91,7 +94,7 @@ export function AppShell({
                 key={t.to}
                 to={t.to}
                 className={cn(
-                  "relative flex min-w-0 flex-col items-center gap-1 py-2.5 text-[11px] transition-colors",
+                  "relative flex min-w-0 flex-col items-center gap-1.5 py-3 text-xs font-medium transition-colors",
                   active ? "text-primary" : "text-muted-foreground",
                 )}
               >

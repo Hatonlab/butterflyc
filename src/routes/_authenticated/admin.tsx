@@ -18,7 +18,10 @@ import { fileToDataUrl, timeAgo } from "@/lib/image";
 import { adminDeleteUser, adminResetPassword } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
 import { ChatView } from "@/components/ChatView";
-import { Coins } from "lucide-react";
+import { Coins, ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RankManager, MemberRankPicker } from "@/components/AdminRanks";
+import { groupMemberRooms } from "@/lib/chat-presentation";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "لوحة التحكم - شات فراشات العرب" }, { name: "description", content: "إدارة أعضاء وغرف ورسائل شات فراشات العرب." }, { property: "og:title", content: "لوحة التحكم - شات فراشات العرب" }, { property: "og:description", content: "لوحة إدارة شات فراشات العرب." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -128,6 +131,7 @@ function MembersTab({ me, people, online }: { me: Me; people: Person[]; online: 
   return (
     <div className="space-y-3">
       <SearchBox value={q} onChange={setQ} />
+      {me.isAdmin && <RankManager />}
       {list.map((p) => (
         <button key={p.id} onClick={() => setSel(p)} className="glass flex w-full items-center gap-3 rounded-2xl p-3 text-right">
           <UserAvatar src={p.avatar_url} name={p.username} online={online.has(p.id)} />
@@ -205,6 +209,7 @@ function MemberDialog({ me, person, onClose }: { me: Me; person: Person; onClose
           </DialogTitle>
         </DialogHeader>
         {me.isAdmin && <GrantCoins person={person} />}
+        {me.isAdmin && <MemberRankPicker me={me} person={person} />}
         {isOwnerTarget ? (
           <p className="text-sm text-muted-foreground">هذا حساب مالك التطبيق ولديه جميع الصلاحيات.</p>
         ) : (
@@ -459,35 +464,48 @@ function RoomEditor({
 function MessagesTab({ me, people }: { me: Me; people?: Map<string, Person> | undefined }) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
-  const { data } = useQuery({
+  const [memberId, setMemberId] = useState<string | null>(null);
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const { data, isPending, isError } = useQuery({
     queryKey: ["admin-msgs"],
     queryFn: async () => {
-      const [m, r] = await Promise.all([
-        supabase.from("messages").select("*").order("created_at", { ascending: false }).limit(300),
-        supabase.from("rooms").select("id,name"),
-      ]);
-      return { msgs: m.data ?? [], rooms: new Map((r.data ?? []).map((x) => [x.id, x.name])) };
+      const rooms = await supabase.from("rooms").select("id,name");
+      if (rooms.error) throw rooms.error;
+      const first = await supabase.from("messages").select("*").order("created_at", { ascending: true }).order("id").range(0, 999);
+      if (first.error) throw first.error;
+      const msgs = first.data;
+      for (let start = 1000; msgs.length === start; start += 1000) {
+        const next = await supabase.from("messages").select("*").order("created_at", { ascending: true }).order("id").range(start, start + 999);
+        if (next.error) throw next.error;
+        msgs.push(...next.data);
+      }
+      return { msgs, rooms: new Map(rooms.data.map((x) => [x.id, x.name])) };
     },
   });
   const canAll = can(me, "messages") || me.roles.includes("moderator");
-  const msgs = (data?.msgs ?? [])
-    .filter((m) => canAll || me.roomMods.includes(m.room_id))
-    .filter((m) => !q || m.content.includes(q) || people?.get(m.user_id)?.username.includes(q));
+  const groups = groupMemberRooms((data?.msgs ?? []).filter((m) => canAll || me.roomMods.includes(m.room_id)));
+  const selected = groups.find((g) => g.userId === memberId);
+  const member = memberId ? people?.get(memberId) : undefined;
   return (
-    <div className="space-y-2">
-      <SearchBox value={q} onChange={setQ} />
-      {msgs.map((m) => (
-        <MsgRow
-          key={m.id}
-          who={people?.get(m.user_id)}
-          meta={`${data?.rooms.get(m.room_id) ?? ""} · ${timeAgo(m.created_at)}`}
-          content={m.content || (m.media_type === "image" ? "📷 صورة" : m.media_type === "video" ? "🎬 فيديو" : "🎤 رسالة صوتية")}
-          onDelete={async () => {
-            await supabase.from("messages").delete().eq("id", m.id);
-            qc.invalidateQueries({ queryKey: ["admin-msgs"] });
-          }}
-        />
-      ))}
+    <div className="space-y-3">
+      {memberId ? <Button variant="ghost" onClick={() => { if (roomId) setRoomId(null); else setMemberId(null); }}><ArrowRight className="h-4 w-4" />{roomId ? "غرف العضو" : "كل الأعضاء"}</Button> : <SearchBox value={q} onChange={setQ} />}
+      {isPending && <p className="py-8 text-center text-muted-foreground">جارٍ تحميل الرسائل…</p>}
+      {isError && <p className="py-8 text-center text-destructive">تعذر تحميل الرسائل</p>}
+      {!memberId && groups.filter((g) => !q || people?.get(g.userId)?.username.includes(q) || [...g.rooms.values()].flat().some((m) => m.content.includes(q))).map((g) => {
+        const person = people?.get(g.userId);
+        return <Button key={g.userId} variant="ghost" onClick={() => { setMemberId(g.userId); setRoomId(null); }} className="glass h-auto w-full justify-start gap-3 whitespace-normal rounded-lg p-4 text-right">
+          <UserAvatar src={person?.avatar_url} name={person?.username ?? "عضو"} />
+          <div className="min-w-0 flex-1"><div className="bidi-plain break-words font-semibold">{person?.username ?? "عضو محذوف"}</div><p className="mt-1 text-sm text-muted-foreground">{g.count} رسالة · {g.rooms.size} غرف</p></div><ChevronLeft className="h-5 w-5 shrink-0 text-muted-foreground" />
+        </Button>;
+      })}
+      {!isPending && !memberId && groups.length === 0 && <p className="py-8 text-center text-muted-foreground">لا توجد رسائل</p>}
+      {memberId && <h3 className="bidi-plain break-words font-display text-lg">{member?.username ?? "عضو"}</h3>}
+      {selected && !roomId && [...selected.rooms.entries()].map(([id, messages]) => <Button key={id} variant="ghost" className="glass h-auto w-full justify-start gap-3 whitespace-normal rounded-lg p-4 text-right" onClick={() => setRoomId(id)}><DoorOpen className="h-6 w-6 shrink-0 text-primary" /><span className="min-w-0 flex-1 break-words">{data?.rooms.get(id) ?? "غرفة محذوفة"}</span><span className="text-sm text-muted-foreground">{messages.length}</span><ChevronLeft className="h-4 w-4" /></Button>)}
+      {selected && roomId && <Dialog open onOpenChange={(open) => !open && setRoomId(null)}><DialogContent dir="rtl" className="flex h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-xl"><DialogHeader className="shrink-0 border-b border-border p-4 pl-12"><DialogTitle className="bidi-plain break-words text-base">{member?.username} · {data?.rooms.get(roomId)}</DialogTitle></DialogHeader><div className="min-h-0 flex-1"><ChatView readOnly meId={me.profile.id} messages={(selected.rooms.get(roomId) ?? []).map((m) => ({ ...m, author: { username: member?.username ?? "عضو", avatar_url: member?.avatar_url ?? null, badge: member?.badge ?? null } }))} canDelete={() => true} onDelete={async (m) => {
+        const { error } = await supabase.from("messages").delete().eq("id", m.id);
+        if (error) { toast.error("تعذر حذف الرسالة"); return; }
+        void qc.invalidateQueries({ queryKey: ["admin-msgs"] });
+      }} onSend={async () => {}} /></div></DialogContent></Dialog>}
     </div>
   );
 }
@@ -505,7 +523,8 @@ function PrivateTab({ people }: { people?: Map<string, Person> | undefined }) {
     data.forEach((m) => {
       const [a, b] = [m.sender_id, m.receiver_id].sort();
       const k = `${a}|${b}`;
-      const c = map.get(k) ?? { a: a!, b: b!, last: m, count: 0 };
+      if (!a || !b) return;
+      const c = map.get(k) ?? { a, b, last: m, count: 0 };
       c.count++;
       map.set(k, c);
     });

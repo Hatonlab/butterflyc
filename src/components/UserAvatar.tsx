@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { levelFromXp } from "@/lib/gifts";
+import { Crown, ShieldCheck, Sparkles } from "lucide-react";
 
 export function UserAvatar({
   src,
@@ -44,7 +45,8 @@ export function LevelBadge({ xp }: { xp: number }) {
 
 export function RoleBadge({ label }: { label: string | null }) {
   if (!label) return null;
+  const Icon = label.includes("المالك") ? Crown : label.includes("مدير") || label.includes("مشرف") ? ShieldCheck : Sparkles;
   return (
-    <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[10px] font-semibold text-gold">{label}</span>
+    <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-gold/20 bg-gold/10 px-2 py-1 text-[11px] font-semibold text-gold"><Icon className="h-3 w-3 shrink-0" /><span className="break-words">{label}</span></span>
   );
 }
