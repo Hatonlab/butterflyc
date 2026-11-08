@@ -7,7 +7,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 type GiftEvent = Database["public"]["Tables"]["gifts"]["Row"];
 
-export function GiftEffects({ userId }: { userId?: string }) {
+export function GiftEffects({ userId }: { userId?: string | undefined }) {
   const [queue, setQueue] = useState<GiftEvent[]>([]);
   const { data: people } = usePeople();
   const qc = useQueryClient();
