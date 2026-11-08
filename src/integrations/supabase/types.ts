@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_ranks: {
+        Row: {
+          badge: string
+          id: string
+          name: string
+          position: number
+        }
+        Insert: {
+          badge?: string
+          id?: string
+          name: string
+          position?: number
+        }
+        Update: {
+          badge?: string
+          id?: string
+          name?: string
+          position?: number
+        }
+        Relationships: []
+      }
       gifts: {
         Row: {
           cost: number
@@ -51,6 +72,36 @@ export type Database = {
             foreignKeyName: "gifts_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_ranks: {
+        Row: {
+          rank_id: string
+          user_id: string
+        }
+        Insert: {
+          rank_id: string
+          user_id: string
+        }
+        Update: {
+          rank_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_ranks_rank_id_fkey"
+            columns: ["rank_id"]
+            isOneToOne: false
+            referencedRelation: "chat_ranks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_ranks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
