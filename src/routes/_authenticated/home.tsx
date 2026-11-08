@@ -55,11 +55,11 @@ function Home() {
               <img
                 src={r.image_url || "/rooms/general.svg"}
                 alt={r.name}
-                className="h-14 w-14 shrink-0 rounded-xl object-cover sm:h-16 sm:w-16"
+                className="h-16 w-16 shrink-0 rounded-xl object-cover sm:h-20 sm:w-20"
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="bidi-plain truncate font-semibold">{r.name}</h4>
+                  <h4 className="bidi-plain truncate text-lg font-semibold">{r.name}</h4>
                   {r.locked && <Lock className="h-3.5 w-3.5 text-gold" />}
                 </div>
                 <p className="bidi-plain mt-1 line-clamp-2 text-sm text-muted-foreground">{r.description}</p>

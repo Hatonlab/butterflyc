@@ -10,6 +10,7 @@ import { GIFTS, levelFromXp, type Gift } from "@/lib/gifts";
 import { useMe, meQueryKey } from "@/lib/auth";
 import type { Person } from "@/lib/people";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export function GiftDialog({ person, onClose }: { person: Person; onClose: () => void }) {
   const qc = useQueryClient();
@@ -100,12 +101,12 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
               {GIFTS.map((g, i) => {
                 const afford = coins >= g.cost;
                 return (
-                  <button
+                  <Button
                     key={g.key}
                     onClick={() => setSel(g)}
                     style={{ animationDelay: `${i * 40}ms` }}
                     className={cn(
-                      "animate-pop-in flex flex-col items-center gap-0.5 rounded-2xl border border-border bg-secondary/60 p-2 transition hover:-translate-y-0.5",
+                      "animate-pop-in h-auto whitespace-normal flex flex-col items-center gap-0.5 rounded-2xl border border-border bg-secondary/60 p-2 transition hover:-translate-y-0.5",
                       sel?.key === g.key && "border-primary bg-primary/15 shadow-glow",
                       !afford && "opacity-45",
                     )}
@@ -116,17 +117,17 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
                       <Coins className="h-3 w-3" />
                       {g.cost}
                     </span>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
-            <button
+            <Button
               disabled={!sel || busy || coins < (sel?.cost ?? 0)}
               onClick={send}
               className="h-11 rounded-full bg-gradient-primary font-bold text-primary-foreground shadow-glow transition active:scale-95 disabled:opacity-40"
             >
               {sel && coins < sel.cost ? "رصيدك لا يكفي" : sel ? `إرسال ${sel.name} ${sel.emoji}` : "اختر هدية"}
-            </button>
+            </Button>
             <p className="text-center text-[11px] text-muted-foreground">تحصل على 2 كونز كل 10 دقائق تفاعل</p>
           </>
         )}
