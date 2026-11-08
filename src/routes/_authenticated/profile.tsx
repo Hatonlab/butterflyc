@@ -9,6 +9,7 @@ import { UserAvatar, RoleBadge } from "@/components/UserAvatar";
 import { meQueryKey, roleLabel, useMe } from "@/lib/auth";
 import { fileToDataUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
+import { usePeople } from "@/lib/people";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({ meta: [{ title: "ملفي الشخصي - شات فراشات العرب" }, { name: "description", content: "صورتك وحالتك وإعدادات حسابك في شات فراشات العرب." }, { property: "og:title", content: "ملفي الشخصي - شات فراشات العرب" }, { property: "og:description", content: "الملف الشخصي وإعدادات حسابك." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -20,6 +21,7 @@ const field =
 
 function ProfilePage() {
   const { data: me } = useMe();
+  const { data: people } = usePeople();
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState("");
@@ -40,10 +42,11 @@ function ProfilePage() {
   if (!me) return <AppShell>{null}</AppShell>;
 
   async function save(): Promise<void> {
+    if (!me) return;
     const { error } = await supabase
       .from("profiles")
       .update({ status: status.trim(), gender, age: parseInt(age, 10) || 18, avatar_url: avatar })
-      .eq("id", me!.profile.id);
+      .eq("id", me.profile.id);
     if (error) { toast.error("تعذر الحفظ"); return; }
     toast.success("تم حفظ الملف الشخصي");
     qc.invalidateQueries({ queryKey: meQueryKey });
@@ -81,7 +84,7 @@ function ProfilePage() {
           />
           <h2 className="bidi-plain mt-3 font-display text-2xl">{me.profile.username}</h2>
           <div className="mt-1">
-            <RoleBadge label={roleLabel(me.roles)} />
+            <RoleBadge label={people?.byId.get(me.profile.id)?.badge ?? roleLabel(me.roles)} />
           </div>
         </div>
 
