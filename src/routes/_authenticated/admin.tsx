@@ -138,7 +138,7 @@ function MembersTab({ me, people, online }: { me: Me; people: Person[]; online: 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="bidi-plain truncate font-semibold">{p.username}</span>
-              <RoleBadge label={p.badge} />
+              <RoleBadge label={p.badge} badgeImage={p.badgeImage} />
               {p.banned && <span className="rounded-full bg-destructive/20 px-2 text-[10px] text-destructive">محظور</span>}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -501,7 +501,7 @@ function MessagesTab({ me, people }: { me: Me; people?: Map<string, Person> | un
       {!isPending && !memberId && groups.length === 0 && <p className="py-8 text-center text-muted-foreground">لا توجد رسائل</p>}
       {memberId && <h3 className="bidi-plain break-words font-display text-lg">{member?.username ?? "عضو"}</h3>}
       {selected && !roomId && [...selected.rooms.entries()].map(([id, messages]) => <Button key={id} variant="ghost" className="glass h-auto w-full justify-start gap-3 whitespace-normal rounded-lg p-4 text-right" onClick={() => setRoomId(id)}><DoorOpen className="h-6 w-6 shrink-0 text-primary" /><span className="min-w-0 flex-1 break-words">{data?.rooms.get(id) ?? "غرفة محذوفة"}</span><span className="text-sm text-muted-foreground">{messages.length}</span><ChevronLeft className="h-4 w-4" /></Button>)}
-      {selected && roomId && <Dialog open onOpenChange={(open) => !open && setRoomId(null)}><DialogContent dir="rtl" className="flex h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-xl"><DialogHeader className="shrink-0 border-b border-border p-4 pl-12"><DialogTitle className="bidi-plain break-words text-base">{member?.username} · {data?.rooms.get(roomId)}</DialogTitle></DialogHeader><div className="min-h-0 flex-1"><ChatView readOnly meId={me.profile.id} messages={(selected.rooms.get(roomId) ?? []).map((m) => ({ ...m, author: { username: member?.username ?? "عضو", avatar_url: member?.avatar_url ?? null, badge: member?.badge ?? null } }))} canDelete={() => true} onDelete={async (m) => {
+      {selected && roomId && <Dialog open onOpenChange={(open) => !open && setRoomId(null)}><DialogContent dir="rtl" className="flex h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-xl"><DialogHeader className="shrink-0 border-b border-border p-4 pl-12"><DialogTitle className="bidi-plain break-words text-base">{member?.username} · {data?.rooms.get(roomId)}</DialogTitle></DialogHeader><div className="min-h-0 flex-1"><ChatView readOnly meId={me.profile.id} messages={(selected.rooms.get(roomId) ?? []).map((m) => ({ ...m, author: { username: member?.username ?? "عضو", avatar_url: member?.avatar_url ?? null, badge: member?.badge ?? null, badgeImage: member?.badgeImage ?? null } }))} canDelete={() => true} onDelete={async (m) => {
         const { error } = await supabase.from("messages").delete().eq("id", m.id);
         if (error) { toast.error("تعذر حذف الرسالة"); return; }
         void qc.invalidateQueries({ queryKey: ["admin-msgs"] });
@@ -598,7 +598,7 @@ function ConvoDialog({ pair, people, onClose }: { pair: [string, string]; people
             meId={a}
             messages={msgs.map((m) => {
               const p = people?.get(m.sender_id);
-              return { ...m, user_id: m.sender_id, author: { username: p?.username ?? "عضو", avatar_url: p?.avatar_url ?? null, badge: p?.badge ?? null } };
+              return { ...m, user_id: m.sender_id, author: { username: p?.username ?? "عضو", avatar_url: p?.avatar_url ?? null, badge: p?.badge ?? null, badgeImage: p?.badgeImage ?? null } };
             })}
             canDelete={() => true}
             onDelete={async (m) => {

@@ -84,7 +84,7 @@ function ProfilePage() {
           />
           <h2 className="bidi-plain mt-3 font-display text-2xl">{me.profile.username}</h2>
           <div className="mt-1">
-            <RoleBadge label={people?.byId.get(me.profile.id)?.badge ?? roleLabel(me.roles)} />
+            <RoleBadge label={people?.byId.get(me.profile.id)?.badge ?? roleLabel(me.roles)} badgeImage={people?.byId.get(me.profile.id)?.badgeImage} />
           </div>
         </div>
 

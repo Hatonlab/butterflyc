@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Coins, MessageCircle } from "lucide-react";
+import { Coins, MessageCircle, Check, Gift as GiftIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -11,6 +11,8 @@ import { useMe, meQueryKey } from "@/lib/auth";
 import type { Person } from "@/lib/people";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { GiftArtwork } from "./GiftArtwork";
+import { compactCoins } from "@/lib/chat-presentation";
 
 export function GiftDialog({ person, onClose }: { person: Person; onClose: () => void }) {
   const qc = useQueryClient();
@@ -18,12 +20,14 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
   const [sel, setSel] = useState<Gift | null>(null);
   const [busy, setBusy] = useState(false);
   const [burst, setBurst] = useState<Gift | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
   const coins = me?.profile.coins ?? 0;
   const lv = levelFromXp(person.xp ?? 0);
   const self = me?.profile.id === person.id;
 
   async function send() {
-    if (!sel) return;
+    if (!sel || busy || burst) return;
     setBusy(true);
     const { error } = await supabase.rpc("send_gift", { _receiver: person.id, _gift: sel.key });
     setBusy(false);
@@ -35,7 +39,7 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
     qc.invalidateQueries({ queryKey: meQueryKey });
     qc.invalidateQueries({ queryKey: ["people"] });
     toast.success(`أرسلت ${sel.name} ${sel.emoji} إلى ${person.username}`);
-    setTimeout(onClose, 1600);
+    closeTimer.current = setTimeout(onClose, 1600);
   }
 
   return (
@@ -43,7 +47,7 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
       <DialogContent dir="rtl" className="glass max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-x-hidden overflow-y-auto border-primary/20 p-4 sm:max-w-md sm:p-6">
         {burst && (
           <div className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center">
-            <span className="animate-gift-burst text-8xl drop-shadow-2xl">{burst.emoji}</span>
+            <GiftArtwork gift={burst} className="animate-gift-burst w-48" />
             {Array.from({ length: 12 }).map((_, i) => (
               <span
                 key={i}
@@ -65,7 +69,7 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
           </div>
           <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-2">
             <h3 className="bidi-plain min-w-0 break-all text-xl font-bold">{person.username}</h3>
-            <RoleBadge label={person.badge} />
+            <RoleBadge label={person.badge} badgeImage={person.badgeImage} />
           </div>
           {person.status && <p className="bidi-plain max-w-full break-words [overflow-wrap:anywhere] text-sm text-muted-foreground">{person.status}</p>}
           <div className="w-full max-w-60">
@@ -92,9 +96,9 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
         {!self && (
           <>
             <div className="mt-2 flex items-center justify-between">
-              <h4 className="font-display">أرسل هدية</h4>
+              <h4 className="flex items-center gap-2 font-display"><GiftIcon className="h-5 w-5 text-primary" />أرسل هدية</h4>
               <span className="flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold text-gold">
-                <Coins className="h-3.5 w-3.5" /> {coins}
+                <Coins className="h-3.5 w-3.5" /> <bdi dir="ltr">{compactCoins(coins)}</bdi>
               </span>
             </div>
             <div className="grid grid-cols-4 gap-2">
@@ -103,17 +107,22 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
                 return (
                   <Button
                     key={g.key}
+                    variant="ghost"
+                    aria-label={`${g.name} · ${g.cost} كونز`}
+                    aria-pressed={sel?.key === g.key}
+                    disabled={busy || !!burst}
                     onClick={() => setSel(g)}
                     style={{ animationDelay: `${i * 40}ms` }}
                     className={cn(
-                      "animate-pop-in h-auto whitespace-normal flex flex-col items-center gap-0.5 rounded-2xl border border-border bg-secondary/60 p-2 transition hover:-translate-y-0.5",
-                      sel?.key === g.key && "border-primary bg-primary/15 shadow-glow",
-                      !afford && "opacity-45",
+                      "relative animate-page-in h-auto min-w-0 whitespace-normal flex flex-col items-center gap-1 rounded-lg border border-border bg-secondary/30 p-1.5 text-foreground transition hover:border-primary/60",
+                      sel?.key === g.key && "border-primary bg-primary/10 ring-1 ring-primary shadow-glow",
+                      !afford && "text-muted-foreground",
                     )}
                   >
-                    <span className={cn("text-3xl transition", sel?.key === g.key && "scale-125 animate-floaty")}>{g.emoji}</span>
-                    <span className="text-[11px]">{g.name}</span>
-                    <span className="flex items-center gap-0.5 text-[10px] font-bold text-gold">
+                    {sel?.key === g.key && <Check className="absolute right-1 top-1 z-10 h-3 w-3 text-primary" />}
+                    <GiftArtwork gift={g} className="h-16 sm:h-20" />
+                    <span className="text-xs font-semibold">{g.name}</span>
+                    <span className="flex items-center gap-0.5 text-xs font-bold text-gold">
                       <Coins className="h-3 w-3" />
                       {g.cost}
                     </span>
@@ -122,11 +131,11 @@ export function GiftDialog({ person, onClose }: { person: Person; onClose: () =>
               })}
             </div>
             <Button
-              disabled={!sel || busy || coins < (sel?.cost ?? 0)}
+              disabled={!sel || busy || !!burst || coins < (sel?.cost ?? 0)}
               onClick={send}
               className="h-11 rounded-full bg-gradient-primary font-bold text-primary-foreground shadow-glow transition active:scale-95 disabled:opacity-40"
             >
-              {sel && coins < sel.cost ? "رصيدك لا يكفي" : sel ? `إرسال ${sel.name} ${sel.emoji}` : "اختر هدية"}
+              {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : burst ? <><Check className="h-5 w-5" />تم الإرسال</> : sel && coins < sel.cost ? "رصيدك لا يكفي" : sel ? <><GiftIcon className="h-5 w-5" />إرسال {sel.name} · {sel.cost} كونز</> : "اختر هدية"}
             </Button>
             <p className="text-center text-[11px] text-muted-foreground">تحصل على 2 كونز كل 10 دقائق تفاعل</p>
           </>

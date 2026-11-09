@@ -61,7 +61,7 @@ function OnlinePage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="bidi-plain truncate font-semibold">{p.username}</span>
-                  <RoleBadge label={p.badge} />
+                  <RoleBadge label={p.badge} badgeImage={p.badgeImage} />
                 </div>
                 <p className="bidi-plain truncate text-xs text-muted-foreground">
                   {p.gender} · {p.age} سنة {p.status && `· ${p.status}`}

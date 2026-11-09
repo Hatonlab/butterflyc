@@ -44,7 +44,7 @@ export function LevelBadge({ xp }: { xp: number }) {
   );
 }
 
-export function RoleBadge({ label, badgeImage }: { label: string | null; badgeImage?: string | null }) {
+export function RoleBadge({ label, badgeImage }: { label: string | null; badgeImage?: string | null | undefined }) {
   if (!label && !badgeImage) return null;
   const text = label ?? "شارة الرتبة";
   const Icon = text.includes("المالك") ? Crown : text.includes("مدير") || text.includes("مشرف") ? ShieldCheck : Sparkles;
