@@ -15,7 +15,7 @@ export type ChatMsg = {
   created_at: string;
   media_url?: string | null;
   media_type?: string | null;
-  author?: { username: string; avatar_url: string | null; badge?: string | null; xp?: number };
+  author?: { username: string; avatar_url: string | null; badge?: string | null; badgeImage?: string | null; xp?: number };
 };
 
 export type SendPayload = { content: string; media_url?: string | null; media_type?: string | null };
@@ -193,7 +193,7 @@ export function ChatView({
                   <div className="mb-1 flex min-w-0 flex-wrap items-center gap-1.5 px-1 text-xs text-muted-foreground">
                     <span className="bidi-plain min-w-0 break-all font-semibold text-foreground/85">{m.author?.username}</span>
                     {m.author?.xp !== undefined && <LevelBadge xp={m.author.xp} />}
-                    <RoleBadge label={m.author?.badge ?? null} />
+                    <RoleBadge label={m.author?.badge ?? null} badgeImage={m.author?.badgeImage} />
                   </div>
                 )}
                 <div

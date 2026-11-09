@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Save, Trash2, Award } from "lucide-react";
+import { Plus, Save, Trash2, Award, ImagePlus, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { canAssignRank } from "@/lib/chat-presentation";
 import type { Me } from "@/lib/auth";
 import type { Person } from "@/lib/people";
 import type { Database } from "@/integrations/supabase/types";
+import { uploadRankBadge } from "@/lib/rank-media";
+import { RoleBadge } from "./UserAvatar";
 
 type Rank = Database["public"]["Tables"]["chat_ranks"]["Row"];
 
@@ -41,20 +43,37 @@ function RankEditor({ rank }: { rank: Rank }) {
   const [name, setName] = useState(rank.name);
   const [badge, setBadge] = useState(rank.badge);
   const [position, setPosition] = useState(rank.position);
+  const [imagePath, setImagePath] = useState(rank.badge_image_path);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  async function upload(file?: File) {
+    if (!file || busy) return;
+    setBusy(true);
+    try { setImagePath(await uploadRankBadge(file)); }
+    catch (error) { toast.error(error instanceof Error ? error.message : "تعذر رفع الشارة"); }
+    finally { setBusy(false); }
+  }
   async function save(remove = false) {
     if (remove && !window.confirm(`حذف رتبة ${rank.name} وشاراتها من الأعضاء؟`)) return;
     setBusy(true);
-    const { error } = await (remove ? supabase.from("chat_ranks").delete().eq("id", rank.id) : supabase.from("chat_ranks").update({ name: name.trim(), badge: badge.trim(), position }).eq("id", rank.id));
+    const { error } = await (remove ? supabase.from("chat_ranks").delete().eq("id", rank.id) : supabase.from("chat_ranks").update({ name: name.trim(), badge: badge.trim() || "⭐", position, badge_image_path: imagePath }).eq("id", rank.id));
     setBusy(false);
     if (error) toast.error("تعذر حفظ الرتبة");
     else { toast.success(remove ? "تم حذف الرتبة" : "تم حفظ الرتبة"); void qc.invalidateQueries({ queryKey: ["chat-ranks"] }); void qc.invalidateQueries({ queryKey: ["people"] }); }
   }
   return <div className="grid min-w-0 grid-cols-[3rem_minmax(0,1fr)_3rem] gap-2 rounded-lg border border-border bg-card p-3">
+    <div className="col-span-3 flex min-w-0 flex-wrap items-center justify-between gap-2">
+      <RoleBadge label={name} badgeImage={imagePath} />
+      <div className="flex shrink-0 gap-1">
+        <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" hidden onChange={(e) => { void upload(e.target.files?.[0]); e.target.value = ""; }} />
+        <Button variant="secondary" size="sm" disabled={busy} onClick={() => fileRef.current?.click()} title="رفع صورة أو GIF"><ImagePlus className="h-4 w-4" />{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "صورة / GIF"}</Button>
+        {imagePath && <Button variant="ghost" size="icon" disabled={busy} onClick={() => setImagePath(null)} aria-label="إزالة صورة الشارة" title="إزالة صورة الشارة"><X className="h-4 w-4" /></Button>}
+      </div>
+    </div>
     <input aria-label="شارة الرتبة" value={badge} onChange={(e) => setBadge(e.target.value)} maxLength={16} className="h-11 min-w-0 rounded-lg bg-secondary text-center text-xl" />
     <input aria-label="اسم الرتبة" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} className="h-11 min-w-0 rounded-lg bg-secondary px-3" />
     <input aria-label="مستوى الرتبة" type="number" min={1} value={position} onChange={(e) => setPosition(Math.max(1, Number(e.target.value) || 1))} className="h-11 min-w-0 rounded-lg bg-secondary text-center" />
-    <div className="col-span-3 flex justify-end gap-2"><Button size="sm" variant="ghost" disabled={busy} onClick={() => void save(true)} aria-label="حذف الرتبة" title="حذف الرتبة"><Trash2 className="h-4 w-4 text-destructive" /></Button><Button size="sm" variant="secondary" disabled={busy || !name.trim() || !badge.trim()} onClick={() => void save()}><Save className="h-4 w-4" />حفظ</Button></div>
+    <div className="col-span-3 flex justify-end gap-2"><Button size="sm" variant="ghost" disabled={busy} onClick={() => void save(true)} aria-label="حذف الرتبة" title="حذف الرتبة"><Trash2 className="h-4 w-4 text-destructive" /></Button><Button size="sm" variant="secondary" disabled={busy || !name.trim() || (!badge.trim() && !imagePath)} onClick={() => void save()}><Save className="h-4 w-4" />حفظ</Button></div>
   </div>;
 }
 

@@ -21,7 +21,8 @@ export function usePeople() {
       const list = (p.data ?? []).map((pr) => ({
         ...pr,
         roles: roles.get(pr.id) ?? [],
-        badge: [roleLabel(roles.get(pr.id) ?? []), rankByUser.get(pr.id) ? `${rankByUser.get(pr.id)?.badge} ${rankByUser.get(pr.id)?.name}` : null].filter(Boolean).join(" · ") || null,
+        badge: [roleLabel(roles.get(pr.id) ?? []), rankByUser.get(pr.id) ? `${rankByUser.get(pr.id)?.badge_image_path ? "" : rankByUser.get(pr.id)?.badge} ${rankByUser.get(pr.id)?.name}`.trim() : null].filter(Boolean).join(" · ") || null,
+        badgeImage: rankByUser.get(pr.id)?.badge_image_path ?? null,
       }));
       const byId = new Map<string, (typeof list)[number]>(list.map((x) => [x.id, x]));
       return { list, byId };
@@ -29,4 +30,4 @@ export function usePeople() {
   });
 }
 
-export type Person = Profile & { roles: Role[]; badge: string | null };
+export type Person = Profile & { roles: Role[]; badge: string | null; badgeImage?: string | null };
