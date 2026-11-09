@@ -62,7 +62,7 @@ function RoomPage() {
     const isRoomMod = false;
     return {
       ...m,
-      author: { username: p?.username ?? "عضو", avatar_url: p?.avatar_url ?? null, badge: p?.badge ?? (isRoomMod ? "مشرف" : null), xp: p?.xp ?? 0 },
+      author: { username: p?.username ?? "عضو", avatar_url: p?.avatar_url ?? null, badge: p?.badge ?? (isRoomMod ? "مشرف" : null), badgeImage: p?.badgeImage ?? null, xp: p?.xp ?? 0 },
     };
   });
 

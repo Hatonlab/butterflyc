@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { levelFromXp } from "@/lib/gifts";
 import { Crown, ShieldCheck, Sparkles } from "lucide-react";
+import { RankImage } from "./RankImage";
 
 export function UserAvatar({
   src,
@@ -43,10 +44,11 @@ export function LevelBadge({ xp }: { xp: number }) {
   );
 }
 
-export function RoleBadge({ label }: { label: string | null }) {
-  if (!label) return null;
-  const Icon = label.includes("المالك") ? Crown : label.includes("مدير") || label.includes("مشرف") ? ShieldCheck : Sparkles;
+export function RoleBadge({ label, badgeImage }: { label: string | null; badgeImage?: string | null | undefined }) {
+  if (!label && !badgeImage) return null;
+  const text = label ?? "شارة الرتبة";
+  const Icon = text.includes("المالك") ? Crown : text.includes("مدير") || text.includes("مشرف") ? ShieldCheck : Sparkles;
   return (
-    <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-gold/20 bg-gold/10 px-2 py-1 text-[11px] font-semibold text-gold"><Icon className="h-3 w-3 shrink-0" /><span className="break-words">{label}</span></span>
+    <span className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border border-gold/20 bg-gold/10 px-2 py-1 text-[11px] font-semibold text-gold">{badgeImage ? <RankImage path={badgeImage} name={text} /> : <Icon className="h-3 w-3 shrink-0" />}<span className="break-words [overflow-wrap:anywhere]">{label}</span></span>
   );
 }

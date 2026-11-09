@@ -198,6 +198,7 @@
 }
 
 .app-frame { background: var(--background); }
+.gift-artwork { mix-blend-mode: screen; border-radius: var(--radius-sm); }
 .gift-celebration { animation: gift-arrival 3.5s ease both; }
 .gift-center { animation: gift-rise 1.2s ease both; }
 @keyframes gift-arrival {
@@ -206,6 +207,7 @@
   100% { opacity: 0; transform: translateY(-24px); }
 }
 @keyframes gift-rise {
-  from { transform: scale(.3) rotate(-18deg); }
-  to { transform: scale(1) rotate(0); }
+  0% { transform: scale(.3) rotate(-18deg); }
+  65% { transform: scale(1.08) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); }
 }

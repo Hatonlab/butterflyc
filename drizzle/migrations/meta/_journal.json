@@ -36,6 +36,13 @@
       "when": 1794099929918,
       "tag": "0004_member_ranks_shared_gifts",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794192026182,
+      "tag": "0005_rank_badge_images",
+      "breakpoints": true
     }
   ]
 }
