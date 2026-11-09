@@ -1,0 +1,2 @@
+ALTER TABLE public.chat_ranks ADD COLUMN badge_image_path text;
+COMMENT ON COLUMN public.chat_ranks.badge_image_path IS 'Optional original image or animated GIF path in private chat-media storage; text badge remains a fallback.';

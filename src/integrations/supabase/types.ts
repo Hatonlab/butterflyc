@@ -17,18 +17,21 @@ export type Database = {
       chat_ranks: {
         Row: {
           badge: string
+          badge_image_path: string | null
           id: string
           name: string
           position: number
         }
         Insert: {
           badge?: string
+          badge_image_path?: string | null
           id?: string
           name: string
           position?: number
         }
         Update: {
           badge?: string
+          badge_image_path?: string | null
           id?: string
           name?: string
           position?: number
