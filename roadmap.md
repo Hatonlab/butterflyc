@@ -1,4 +1,6 @@
 # Tasks
+- [ ] Improve gift artwork, selection, and shared celebrations without changing prices.
+- [ ] Support uploaded image and animated GIF rank badges across member and chat views.
 - [x] Enlarge and polish phone UI while preserving stable chat controls.
 - [x] Abbreviate header coin balances with K/M/B/T suffixes.
 - [x] Manage rank badges and assignments, including the owner, without removing owner authority.
