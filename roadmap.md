@@ -1,4 +1,6 @@
 # Tasks
+- [x] Transparent animated gift celebrations without a card.
+- [x] Admin can set any member's level (including the owner).
 - [ ] Improve gift artwork, selection, and shared celebrations without changing prices.
 - [ ] Support uploaded image and animated GIF rank badges across member and chat views.
 - [x] Enlarge and polish phone UI while preserving stable chat controls.

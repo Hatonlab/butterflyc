@@ -18,7 +18,8 @@ import { fileToDataUrl, timeAgo } from "@/lib/image";
 import { adminDeleteUser, adminResetPassword } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
 import { ChatView } from "@/components/ChatView";
-import { Coins, ChevronLeft } from "lucide-react";
+import { Coins, ChevronLeft, TrendingUp } from "lucide-react";
+import { levelFromXp, MAX_LEVEL } from "@/lib/gifts";
 import { Button } from "@/components/ui/button";
 import { RankManager, MemberRankPicker } from "@/components/AdminRanks";
 import { groupMemberRooms } from "@/lib/chat-presentation";
@@ -209,6 +210,7 @@ function MemberDialog({ me, person, onClose }: { me: Me; person: Person; onClose
           </DialogTitle>
         </DialogHeader>
         {me.isAdmin && <GrantCoins person={person} />}
+        {me.isAdmin && <SetLevel person={person} />}
         {me.isAdmin && <MemberRankPicker me={me} person={person} />}
         {isOwnerTarget ? (
           <p className="text-sm text-muted-foreground">هذا حساب مالك التطبيق ولديه جميع الصلاحيات.</p>
@@ -354,6 +356,46 @@ function GrantCoins({ person }: { person: Person }) {
           <Coins className="h-4 w-4" /> إضافة
         </button>
         <button onClick={() => grant(-1)} className="rounded-lg bg-secondary px-3 text-sm">خصم</button>
+      </div>
+    </Group>
+  );
+}
+
+function SetLevel({ person }: { person: Person }) {
+  const qc = useQueryClient();
+  const current = levelFromXp(person.xp ?? 0).level;
+  const [lvl, setLvl] = useState(String(current));
+  const [busy, setBusy] = useState(false);
+  async function apply() {
+    const n = parseInt(lvl, 10);
+    if (!n || n < 1 || n > MAX_LEVEL) {
+      toast.error(`أدخل مستوى من 1 إلى ${MAX_LEVEL}`);
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.rpc("admin_set_level", { _user: person.id, _level: n });
+    setBusy(false);
+    if (error) {
+      toast.error("تعذر تغيير المستوى");
+      return;
+    }
+    toast.success(`أصبح مستوى ${person.username}: ${n}`);
+    qc.invalidateQueries({ queryKey: ["people"] });
+    qc.invalidateQueries({ queryKey: ["me"] });
+  }
+  return (
+    <Group title={`المستوى (الحالي: ${current})`}>
+      <div className="flex w-full gap-2">
+        <input
+          aria-label="المستوى الجديد"
+          value={lvl}
+          onChange={(e) => setLvl(e.target.value.replace(/\D/g, "").slice(0, 4))}
+          inputMode="numeric"
+          className="h-10 w-24 rounded-lg border border-input bg-secondary px-3 text-center outline-none"
+        />
+        <button disabled={busy} onClick={() => void apply()} className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary/15 font-semibold text-primary disabled:opacity-50">
+          <TrendingUp className="h-4 w-4" /> تعيين المستوى
+        </button>
       </div>
     </Group>
   );

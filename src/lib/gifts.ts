@@ -14,6 +14,14 @@ export const GIFTS: Gift[] = [
 
 export const giftByKey = new Map(GIFTS.map((g) => [g.key, g]));
 
+/** Highest level an admin can assign; must match public.admin_set_level(). */
+export const MAX_LEVEL = 1000;
+
+/** Minimum total XP for a level; admin_set_level stores exactly this value. */
+export function xpForLevel(level: number) {
+  return 50 * (Math.max(1, level) - 1) ** 2;
+}
+
 /** Level grows with XP: level n needs 50 * n^2 total XP (level 1 starts at 0). */
 export function levelFromXp(xp: number) {
   const level = Math.floor(Math.sqrt(Math.max(0, xp) / 50)) + 1;
