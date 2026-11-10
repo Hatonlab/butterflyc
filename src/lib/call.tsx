@@ -13,7 +13,7 @@ export type CallUi = {
   phase: CallPhase;
   muted: boolean;
   startedAt: number | null;
-  reason?: string;
+  reason?: string | undefined;
   quality: CallQuality | null;
   reconnecting: boolean;
 };
@@ -58,9 +58,10 @@ async function tuneSender(pc: RTCPeerConnection) {
     try {
       const p = s.getParameters();
       if (!p.encodings?.length) p.encodings = [{}];
-      p.encodings[0].maxBitrate = 64_000;
-      (p.encodings[0] as RTCRtpEncodingParameters & { priority?: string; networkPriority?: string }).priority = "high";
-      (p.encodings[0] as RTCRtpEncodingParameters & { networkPriority?: string }).networkPriority = "high";
+      const enc = p.encodings[0] as RTCRtpEncodingParameters & { priority?: string; networkPriority?: string };
+      enc.maxBitrate = 64_000;
+      enc.priority = "high";
+      enc.networkPriority = "high";
       await s.setParameters(p);
     } catch {
       /* Browser keeps its defaults. */
@@ -87,7 +88,7 @@ export function CallProvider({ children }: { children: ReactNode }) {
   const ringRef = useRef<ReturnType<typeof createRingtone> | null>(null);
   const offerRef = useRef<string | null>(null);
   const answeredHereRef = useRef<string | null>(null);
-  const timersRef = useRef<{ ring?: number; drop?: number; stats?: number; clear?: number }>({});
+  const timersRef = useRef<{ ring?: number | undefined; drop?: number | undefined; stats?: number | undefined; clear?: number | undefined }>({});
   const statsPrev = useRef({ lost: 0, recv: 0 });
 
   const setCall = useCallback((next: CallUi | null | ((c: CallUi | null) => CallUi | null)) => {

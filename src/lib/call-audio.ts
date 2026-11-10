@@ -36,7 +36,7 @@ export function tuneOpus(sdp: string) {
   const idx = lines.findIndex((l) => l.startsWith(`a=fmtp:${pt} `));
   const params = new Map<string, string>();
   if (idx >= 0) {
-    for (const part of lines[idx].slice(`a=fmtp:${pt} `.length).split(";")) {
+    for (const part of (lines[idx] ?? "").slice(`a=fmtp:${pt} `.length).split(";")) {
       const [k, v = ""] = part.trim().split("=");
       if (k) params.set(k, v);
     }
