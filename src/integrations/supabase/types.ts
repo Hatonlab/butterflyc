@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      calls: {
+        Row: {
+          answer: string | null
+          answered_at: string | null
+          callee_id: string
+          caller_id: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          offer: string
+          status: string
+        }
+        Insert: {
+          answer?: string | null
+          answered_at?: string | null
+          callee_id: string
+          caller_id: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          offer: string
+          status?: string
+        }
+        Update: {
+          answer?: string | null
+          answered_at?: string | null
+          callee_id?: string
+          caller_id?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          offer?: string
+          status?: string
+        }
+        Relationships: []
+      }
       chat_ranks: {
         Row: {
           badge: string

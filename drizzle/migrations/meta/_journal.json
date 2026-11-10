@@ -50,6 +50,13 @@
       "when": 1794302308362,
       "tag": "0006_admin_set_level",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794303701644,
+      "tag": "0007_voice_calls",
+      "breakpoints": true
     }
   ]
 }
