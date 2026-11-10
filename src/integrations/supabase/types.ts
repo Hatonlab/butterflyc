@@ -364,6 +364,10 @@ export type Database = {
         Args: { _amount: number; _user: string }
         Returns: number
       }
+      admin_set_level: {
+        Args: { _level: number; _user: string }
+        Returns: number
+      }
       can_moderate_room: {
         Args: { _room: string; _uid: string }
         Returns: boolean
