@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { GIFTS, levelFromXp } from "@/lib/gifts";
+import { GIFTS, levelFromXp, xpForLevel } from "@/lib/gifts";
 
 describe("gifts and levels", () => {
   it("cheapest gift costs 8 coins", () => {
@@ -10,5 +10,8 @@ describe("gifts and levels", () => {
   });
   it("50 xp reaches level 2", () => {
     expect(levelFromXp(50).level).toBe(2);
+  });
+  it("an admin-assigned level reads back as exactly that level", () => {
+    for (const lvl of [1, 2, 7, 50, 1000]) expect(levelFromXp(xpForLevel(lvl)).level).toBe(lvl);
   });
 });
