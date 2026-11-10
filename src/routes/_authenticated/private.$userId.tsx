@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { GiftDialog } from "@/components/GiftDialog";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCall } from "@/lib/call";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
@@ -25,6 +27,7 @@ function PrivateChat() {
   const { data: people } = usePeople();
   const other = people?.byId.get(userId);
   const [gift, setGift] = useState(false);
+  const { startCall } = useCall();
   const myId = me?.profile.id;
   const key = ["pm", myId, userId];
 
@@ -81,10 +84,15 @@ function PrivateChat() {
           <button onClick={() => setGift(true)} className="shrink-0" aria-label="الملف والهدايا">
             <UserAvatar src={other?.avatar_url} name={other?.username ?? "?"} online={online.has(userId)} className="h-10 w-10" />
           </button>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="bidi-plain truncate font-semibold">{other?.username}</h1>
             <p className="text-xs text-muted-foreground">{online.has(userId) ? "متصل الآن" : "غير متصل"}</p>
           </div>
+          {userId !== me.profile.id && (
+            <Button size="icon" variant="secondary" onClick={() => startCall(userId)} aria-label="مكالمة صوتية" className="h-10 w-10 shrink-0 rounded-full text-primary">
+              <Phone className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       }
     >
